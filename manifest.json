@@ -4,10 +4,9 @@
   "version": "1.0.0",
   "description": "Find the best prices across European Amazon marketplaces",
   "permissions": [
-    "activeTab",
     "storage",
-    "sidePanel",
-    "geolocation"
+    "activeTab",
+    "sidePanel"
   ],
   "host_permissions": [
     "*://*.amazon.fr/*",
@@ -21,6 +20,7 @@
     "https://api.exchangerate-api.com/*"
   ],
   "action": {
+    "default_popup": "src/popup/popup.html",
     "default_icon": {
       "16": "assets/icons/icon16.png",
       "48": "assets/icons/icon48.png",
@@ -31,7 +31,7 @@
     "service_worker": "background.js"
   },
   "side_panel": {
-    "default_path": "sidepanel.html"
+    "default_path": "src/sidepanel.html"
   },
   "content_scripts": [
     {
@@ -45,8 +45,8 @@
         "*://*.amazon.se/*",
         "*://*.amazon.co.uk/*"
       ],
-      "js": ["content.js"],
-      "css": ["content.css"]
+      "css": ["dist/content.css"],
+      "js": ["dist/content.js"]
     }
   ]
 } 
