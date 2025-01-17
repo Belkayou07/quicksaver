@@ -1,0 +1,1 @@
+chrome.sidePanel.setPanelBehavior({openPanelOnActionClick:!0}).catch((function(e){return console.error(e)})),chrome.runtime.onMessage.addListener((function(e,n,t){"PRODUCT_DATA"===e.type&&chrome.runtime.sendMessage({type:"UPDATE_PRODUCT_INFO",data:e.data})}));

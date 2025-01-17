@@ -1,0 +1,52 @@
+{
+  "manifest_version": 3,
+  "name": "Quick-Saver",
+  "version": "1.0.0",
+  "description": "Find the best prices across European Amazon marketplaces",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "sidePanel",
+    "geolocation"
+  ],
+  "host_permissions": [
+    "*://*.amazon.fr/*",
+    "*://*.amazon.nl/*",
+    "*://*.amazon.be/*",
+    "*://*.amazon.de/*",
+    "*://*.amazon.it/*",
+    "*://*.amazon.es/*",
+    "*://*.amazon.se/*",
+    "*://*.amazon.co.uk/*",
+    "https://api.exchangerate-api.com/*"
+  ],
+  "action": {
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.amazon.fr/*",
+        "*://*.amazon.nl/*",
+        "*://*.amazon.be/*",
+        "*://*.amazon.de/*",
+        "*://*.amazon.it/*",
+        "*://*.amazon.es/*",
+        "*://*.amazon.se/*",
+        "*://*.amazon.co.uk/*"
+      ],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ]
+} 

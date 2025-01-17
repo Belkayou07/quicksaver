@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Quick-Saver</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Quick-Saver</h1>
+      <p>Find the best prices across Amazon</p>
+    </header>
+    
+    <main>
+      <div id="price-comparison" class="price-comparison">
+        <div class="loading hidden">Searching for better prices...</div>
+        <div class="results hidden">
+          <!-- Results will be populated dynamically -->
+        </div>
+        <div class="no-results hidden">
+          <p>No better prices found at the moment.</p>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <button id="settings-btn" class="btn">Settings</button>
+    </footer>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html> 
