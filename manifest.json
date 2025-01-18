@@ -1,52 +1,53 @@
 {
   "manifest_version": 3,
-  "name": "Quick-Saver",
-  "version": "1.0.0",
-  "description": "Find the best prices across European Amazon marketplaces",
+  "name": "Amazon Product Info",
+  "version": "1.0",
+  "description": "Quickly retrieve product information from Amazon product pages",
   "permissions": [
-    "storage",
     "activeTab",
-    "sidePanel"
+    "storage",
+    "scripting",
+    "tabs"
   ],
   "host_permissions": [
+    "*://*.amazon.com/*",
+    "*://*.amazon.co.uk/*",
     "*://*.amazon.fr/*",
-    "*://*.amazon.nl/*",
-    "*://*.amazon.be/*",
     "*://*.amazon.de/*",
     "*://*.amazon.it/*",
     "*://*.amazon.es/*",
-    "*://*.amazon.se/*",
-    "*://*.amazon.co.uk/*",
+    "*://*.amazon.nl/*",
+    "*://*.amazon.com.be/*",
     "https://api.exchangerate-api.com/*"
   ],
   "action": {
-    "default_popup": "src/popup/popup.html",
-    "default_icon": {
-      "16": "assets/icons/icon16.png",
-      "48": "assets/icons/icon48.png",
-      "128": "assets/icons/icon128.png"
-    }
-  },
-  "background": {
-    "service_worker": "background.js"
-  },
-  "side_panel": {
-    "default_path": "src/sidepanel.html"
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
   },
   "content_scripts": [
     {
       "matches": [
-        "*://*.amazon.fr/*",
-        "*://*.amazon.nl/*",
-        "*://*.amazon.be/*",
-        "*://*.amazon.de/*",
-        "*://*.amazon.it/*",
-        "*://*.amazon.es/*",
-        "*://*.amazon.se/*",
-        "*://*.amazon.co.uk/*"
+        "*://*.amazon.com/*/dp/*",
+        "*://*.amazon.co.uk/*/dp/*",
+        "*://*.amazon.fr/*/dp/*",
+        "*://*.amazon.de/*/dp/*",
+        "*://*.amazon.it/*/dp/*",
+        "*://*.amazon.es/*/dp/*",
+        "*://*.amazon.nl/*/dp/*",
+        "*://*.amazon.com.be/*/dp/*",
+        "*://*.amazon.com/gp/product/*",
+        "*://*.amazon.co.uk/gp/product/*",
+        "*://*.amazon.fr/gp/product/*",
+        "*://*.amazon.de/gp/product/*",
+        "*://*.amazon.it/gp/product/*",
+        "*://*.amazon.es/gp/product/*",
+        "*://*.amazon.nl/gp/product/*",
+        "*://*.amazon.com.be/gp/product/*"
       ],
-      "css": ["dist/content.css"],
-      "js": ["dist/content.js"]
+      "js": ["content.js", "currency.js", "history.js", "price-comparison.js"]
     }
-  ]
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
 } 

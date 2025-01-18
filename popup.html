@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Amazon Product Info</title>
+  <style>
+    :root {
+      --amazon-orange: #FF9900;
+      --amazon-dark: #232F3E;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --background-light: #f8f9fa;
+      --border-radius: 8px;
+      --success-green: #067D68;
+      --price-red: #B12704;
+      --link-blue: #0066c0;
+    }
+
+    body {
+      width: 400px;
+      padding: 0;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--background-light);
+      color: var(--text-primary);
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--amazon-dark) 0%, #37475A 100%);
+      color: white;
+      padding: 15px 20px;
+      font-size: 18px;
+      font-weight: 500;
+      border-bottom: 3px solid var(--amazon-orange);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-icon {
+      font-size: 20px;
+      color: var(--amazon-orange);
+    }
+
+    .content {
+      padding: 20px;
+    }
+
+    .product-container {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .product-container:hover {
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    }
+
+    .image-container {
+      position: relative;
+      background: white;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+    }
+
+    .product-image {
+      max-width: 280px;
+      height: auto;
+      border-radius: 6px;
+      transition: transform 0.3s ease;
+    }
+
+    .product-image:hover {
+      transform: scale(1.05);
+    }
+
+    .product-details {
+      padding: 20px;
+    }
+
+    .product-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 15px 0;
+      line-height: 1.4;
+    }
+
+    .info-row {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+      gap: 12px;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      width: 80px;
+      flex-shrink: 0;
+    }
+
+    .info-value {
+      font-size: 14px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-secondary);
+    }
+
+    .loading-spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid var(--amazon-orange);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error-message {
+      background: #FFF3F3;
+      color: #D72C0D;
+      padding: 15px;
+      border-radius: var(--border-radius);
+      font-size: 14px;
+      margin-top: 15px;
+      border: 1px solid #FED3D3;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .error-icon {
+      color: #D72C0D;
+      font-size: 18px;
+    }
+
+    .price-comparison {
+      margin-top: 20px;
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .comparison-header {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--amazon-dark);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .marketplace-row {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border-radius: 6px;
+      background: var(--background-light);
+      margin-bottom: 8px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: 1px solid transparent;
+      gap: 12px;
+    }
+
+    .marketplace-row:hover {
+      background: #f0f0f0;
+      transform: translateX(5px);
+      border-color: var(--amazon-orange);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .marketplace-name {
+      flex: 1;
+      font-size: 14px;
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .marketplace-name > span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .history-date {
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .marketplace-name::before {
+      content: '🔗';
+      font-size: 12px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .marketplace-row:hover .marketplace-name::before {
+      opacity: 1;
+    }
+
+    .marketplace-price {
+      font-weight: 600;
+      color: var(--price-red);
+      font-size: 15px;
+      min-width: 85px;
+      text-align: right;
+      padding-left: 10px;
+      margin-left: 10px;
+      border-left: 1px solid #eee;
+      white-space: nowrap;
+      align-self: center;
+    }
+
+    .best-price {
+      background: #E7F4F2;
+      border: 1px solid var(--success-green);
+    }
+
+    .best-price:hover {
+      border-color: var(--success-green);
+      background: #daf0ed;
+    }
+
+    .best-price .marketplace-price {
+      color: var(--success-green);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .action-button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .compare-button {
+      background: var(--amazon-dark);
+      color: white;
+    }
+
+    .compare-button:hover {
+      background: var(--amazon-orange);
+      transform: translateY(-2px);
+    }
+
+    .history-button {
+      background: var(--background-light);
+      color: var(--text-primary);
+      border: 1px solid #ddd;
+    }
+
+    .history-button:hover {
+      background: #f0f0f0;
+      transform: translateY(-2px);
+    }
+
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      background-color: var(--amazon-dark);
+      color: white;
+      text-align: center;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .rating-row {
+      cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 10px 0;
+    }
+
+    .rating-row:hover {
+      background-color: var(--background-light);
+      transform: translateX(5px);
+    }
+
+    .rating-value {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #productRatingStars {
+      color: var(--amazon-orange);
+      font-size: 16px;
+      letter-spacing: 2px;
+    }
+
+    #productRatingValue {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    #productReviewCount {
+      color: var(--link-blue);
+      font-size: 13px;
+    }
+
+    .rating-row:hover #productReviewCount {
+      text-decoration: underline;
+    }
+
+    .history-image {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      border-radius: 4px;
+      background: white;
+      border: 1px solid #eee;
+    }
+
+    .history-content {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .history-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .history-name {
+      font-size: 14px;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <span class="header-icon">🛍️</span>
+    <span>Amazon Product Info</span>
+  </div>
+
+  <div class="content">
+    <div id="loading" class="loading" style="display: none;">
+      <div class="loading-spinner"></div>
+      <div>Chargement des informations...</div>
+    </div>
+
+    <div id="error" class="error-message" style="display: none;">
+      <span class="error-icon">⚠️</span>
+      <span id="errorText"></span>
+    </div>
+
+    <div id="productInfo" class="product-container" style="display: none;">
+      <div class="image-container">
+        <img id="productImage" class="product-image" src="" alt="Product Image">
+      </div>
+
+      <div class="product-details">
+        <h2 class="product-name" id="productName"></h2>
+        <div class="info-row">
+          <div class="info-label">Prix</div>
+          <div class="info-value" id="productPrice"></div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Numéro de modèle</div>
+          <div class="info-value" id="productModel"></div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">ASIN</div>
+          <div class="info-value" id="productASIN"></div>
+        </div>
+        <div class="info-row rating-row" id="productRating">
+          <div class="info-label">Note</div>
+          <div class="info-value rating-value">
+            <span id="productRatingStars"></span>
+            <span id="productRatingValue"></span>
+            <span id="productReviewCount"></span>
+          </div>
+        </div>
+        <div class="action-buttons">
+          <button id="compareButton" class="action-button compare-button">
+            <span>🔍</span>
+            Comparer les prix
+          </button>
+          <button id="historyButton" class="action-button history-button">
+            <span>📋</span>
+            Historique
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="priceComparison" class="price-comparison" style="display: none;">
+      <div class="comparison-header">
+        <span>💰</span>
+        <span>Comparaison des prix</span>
+      </div>
+      <div id="comparisonResults"></div>
+    </div>
+  </div>
+
+  <script src="currency.js"></script>
+  <script src="history.js"></script>
+  <script src="translations.js"></script>
+  <script src="price-comparison.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html> 
