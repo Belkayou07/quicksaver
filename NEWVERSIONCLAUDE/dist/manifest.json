@@ -1,0 +1,119 @@
+{
+  "manifest_version": 3,
+  "name": "Quick-Saver",
+  "version": "1.0.0",
+  "description": "Find the best prices across Amazon marketplaces",
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications"
+  ],
+  "host_permissions": [
+    "*://*.amazon.com.au/*",
+    "*://*.amazon.com.be/*",
+    "*://*.amazon.com.br/*",
+    "*://*.amazon.ca/*",
+    "*://*.amazon.cn/*",
+    "*://*.amazon.eg/*",
+    "*://*.amazon.fr/*",
+    "*://*.amazon.de/*",
+    "*://*.amazon.in/*",
+    "*://*.amazon.it/*",
+    "*://*.amazon.co.jp/*",
+    "*://*.amazon.com.mx/*",
+    "*://*.amazon.nl/*",
+    "*://*.amazon.pl/*",
+    "*://*.amazon.sa/*",
+    "*://*.amazon.sg/*",
+    "*://*.amazon.es/*",
+    "*://*.amazon.se/*",
+    "*://*.amazon.com.tr/*",
+    "*://*.amazon.ae/*",
+    "*://*.amazon.co.uk/*",
+    "*://*.amazon.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.amazon.com.au/*",
+        "*://*.amazon.com.be/*",
+        "*://*.amazon.com.br/*",
+        "*://*.amazon.ca/*",
+        "*://*.amazon.cn/*",
+        "*://*.amazon.eg/*",
+        "*://*.amazon.fr/*",
+        "*://*.amazon.de/*",
+        "*://*.amazon.in/*",
+        "*://*.amazon.it/*",
+        "*://*.amazon.co.jp/*",
+        "*://*.amazon.com.mx/*",
+        "*://*.amazon.nl/*",
+        "*://*.amazon.pl/*",
+        "*://*.amazon.sa/*",
+        "*://*.amazon.sg/*",
+        "*://*.amazon.es/*",
+        "*://*.amazon.se/*",
+        "*://*.amazon.com.tr/*",
+        "*://*.amazon.ae/*",
+        "*://*.amazon.co.uk/*",
+        "*://*.amazon.com/*"
+      ],
+      "js": [
+        "contentScript.js"
+      ],
+      "css": [
+        "styles.css"
+      ]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "assets/icon16.png",
+      "32": "assets/icon32.png",
+      "48": "assets/icon48.png",
+      "128": "assets/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "assets/icon16.png",
+    "32": "assets/icon32.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "styles.css"
+      ],
+      "matches": [
+        "*://*.amazon.com.au/*",
+        "*://*.amazon.com.be/*",
+        "*://*.amazon.com.br/*",
+        "*://*.amazon.ca/*",
+        "*://*.amazon.cn/*",
+        "*://*.amazon.eg/*",
+        "*://*.amazon.fr/*",
+        "*://*.amazon.de/*",
+        "*://*.amazon.in/*",
+        "*://*.amazon.it/*",
+        "*://*.amazon.co.jp/*",
+        "*://*.amazon.com.mx/*",
+        "*://*.amazon.nl/*",
+        "*://*.amazon.pl/*",
+        "*://*.amazon.sa/*",
+        "*://*.amazon.sg/*",
+        "*://*.amazon.es/*",
+        "*://*.amazon.se/*",
+        "*://*.amazon.com.tr/*",
+        "*://*.amazon.ae/*",
+        "*://*.amazon.co.uk/*",
+        "*://*.amazon.com/*"
+      ]
+    }
+  ]
+}
