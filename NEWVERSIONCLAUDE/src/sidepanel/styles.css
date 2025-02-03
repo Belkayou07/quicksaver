@@ -1,0 +1,275 @@
+/* Main Sidepanel Styles */
+.sidepanel {
+    font-family: 'Amazon Ember', Arial, sans-serif;
+    background-color: #fff;
+    color: #111;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    max-width: 320px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Header Styles */
+.sidepanel-header {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 12px;
+    border-bottom: 2px solid #f3f3f3;
+    padding-bottom: 8px;
+    flex-shrink: 0;
+}
+
+/* Section Styles */
+.section {
+    margin-bottom: 16px;
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Button and Toggle Styles */
+.button, .toggle {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 13px;
+    color: #111;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: inline-block;
+    text-align: center;
+}
+
+.button:hover, .toggle:hover {
+    background-color: #e7e7e7;
+}
+
+.button.active, .toggle.active {
+    background-color: #ffa41c;
+    border-color: #ffa41c;
+    color: #fff;
+}
+
+/* Input Styles */
+.input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.input:focus {
+    border-color: #ffa41c;
+    box-shadow: 0 0 0 1px rgba(255, 164, 28, 0.5);
+    outline: none;
+}
+
+/* Scrollbar styles */
+.sidepanel-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.sidepanel-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.sidepanel-content::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.sidepanel-content::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Country selector styles */
+.country-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.country-selector h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #2c3e50;
+}
+
+.country-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.country-item {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+    transition: background-color 0.2s;
+}
+
+.country-item:hover {
+    background: #e9ecef;
+}
+
+.country-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    padding-left: 32px;
+}
+
+.country-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.checkmark {
+    position: absolute;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background: #ffffff;
+    border: 2px solid #dee2e6;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.country-checkbox:hover input ~ .checkmark {
+    border-color: #3498db;
+}
+
+.country-checkbox input:checked ~ .checkmark {
+    background: #3498db;
+    border-color: #3498db;
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.country-checkbox input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.country-info {
+    margin-left: 8px;
+}
+
+.country-name {
+    display: block;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.country-currency {
+    display: block;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+/* Settings section styles */
+.settings-section {
+    padding: 8px;
+    background-color: #f8f8f8;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.settings-section h2 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #232f3e;
+}
+
+.settings-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.setting-item {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.setting-item label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: #333;
+}
+
+.setting-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.setting-item select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 200px;
+    margin-left: 8px;
+}
+
+.setting-item select:focus {
+    outline: none;
+    border-color: #232f3e;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 350px) {
+    .sidepanel {
+        padding: 12px;
+    }
+
+    .sidepanel-header {
+        font-size: 16px;
+    }
+
+    .section-title {
+        font-size: 13px;
+    }
+
+    .button, .toggle {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+
+    .input {
+        padding: 6px;
+        font-size: 12px;
+    }
+}

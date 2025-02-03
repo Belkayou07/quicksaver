@@ -6,7 +6,8 @@
   "permissions": [
     "storage",
     "alarms",
-    "notifications"
+    "notifications",
+    "sidePanel"
   ],
   "host_permissions": [
     "*://*.amazon.com.au/*",
@@ -58,56 +59,23 @@
         "*://*.amazon.co.uk/*",
         "*://*.amazon.com/*"
       ],
-      "js": ["contentScript.js"],
-      "css": ["styles.css"]
+      "js": ["contentScript.js"]
     }
   ],
   "background": {
     "service_worker": "background.js",
     "type": "module"
   },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
   "action": {
-    "default_popup": "popup.html",
-    "default_icon": {
-      "16": "assets/icon16.png",
-      "32": "assets/icon32.png",
-      "48": "assets/icon48.png",
-      "128": "assets/icon128.png"
-    }
+    "default_title": "Quick-Saver"
   },
   "icons": {
     "16": "assets/icon16.png",
     "32": "assets/icon32.png",
     "48": "assets/icon48.png",
     "128": "assets/icon128.png"
-  },
-  "web_accessible_resources": [
-    {
-      "resources": ["styles.css"],
-      "matches": [
-        "*://*.amazon.com.au/*",
-        "*://*.amazon.com.be/*",
-        "*://*.amazon.com.br/*",
-        "*://*.amazon.ca/*",
-        "*://*.amazon.cn/*",
-        "*://*.amazon.eg/*",
-        "*://*.amazon.fr/*",
-        "*://*.amazon.de/*",
-        "*://*.amazon.in/*",
-        "*://*.amazon.it/*",
-        "*://*.amazon.co.jp/*",
-        "*://*.amazon.com.mx/*",
-        "*://*.amazon.nl/*",
-        "*://*.amazon.pl/*",
-        "*://*.amazon.sa/*",
-        "*://*.amazon.sg/*",
-        "*://*.amazon.es/*",
-        "*://*.amazon.se/*",
-        "*://*.amazon.com.tr/*",
-        "*://*.amazon.ae/*",
-        "*://*.amazon.co.uk/*",
-        "*://*.amazon.com/*"
-      ]
-    }
-  ]
+  }
 }

@@ -178,3 +178,16 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
     }
   }
 });
+
+// Handle extension icon click to toggle side panel
+chrome.action.onClicked.addListener(async (tab) => {
+  if (tab.id) {
+    // Set the initial state of the side panel if not already set
+    await chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
+  }
+});
+
+// Initialize side panel behavior when extension loads
+chrome.runtime.onInstalled.addListener(async () => {
+  await chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
+});

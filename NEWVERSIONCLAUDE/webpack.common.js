@@ -4,10 +4,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: {
-    popup: './src/popup/index.tsx',
     background: './src/background/index.ts',
     contentScript: './src/content/index.tsx',
-    styles: './src/styles.css'
+    sidepanel: './src/sidepanel/index.tsx'
   },
   module: {
     rules: [
@@ -28,9 +27,6 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
-    alias: {
-      '@': path.resolve(__dirname, 'src'),
-    },
   },
   output: {
     filename: '[name].js',
@@ -39,23 +35,14 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/popup/index.html',
-      filename: 'popup.html',
-      chunks: ['popup'],
+      template: './src/sidepanel/index.html',
+      filename: 'sidepanel.html',
+      chunks: ['sidepanel'],
     }),
     new CopyPlugin({
       patterns: [
-        { 
-          from: 'src/manifest.json',
-          transform(content) {
-            return Buffer.from(JSON.stringify({
-              ...JSON.parse(content.toString()),
-              version: process.env.npm_package_version || '1.0.0'
-            }, null, 2));
-          },
-        },
-        { from: 'src/assets', to: 'assets' },
-        { from: 'src/styles.css', to: 'styles.css' },
+        { from: 'src/manifest.json' },
+        { from: 'src/assets', to: 'assets' }
       ],
     }),
   ],
