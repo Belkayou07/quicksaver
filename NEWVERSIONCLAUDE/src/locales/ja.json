@@ -1,0 +1,22 @@
+{
+    "settings": {
+        "title": "Quick-Saver設定",
+        "regions": {
+            "title": "検索する国を選択",
+            "subtitle": "設定を選択してください"
+        },
+        "display": {
+            "title": "表示設定",
+            "shipping": "配送料を計算",
+            "flags": "国旗を表示",
+            "savings": "節約率を表示"
+        },
+        "currency": {
+            "title": "通貨設定"
+        },
+        "language": {
+            "title": "言語",
+            "select": "言語を選択"
+        }
+    }
+}

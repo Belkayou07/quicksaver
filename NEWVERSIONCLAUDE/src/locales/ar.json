@@ -1,0 +1,22 @@
+{
+    "settings": {
+        "title": "إعدادات Quick-Saver",
+        "regions": {
+            "title": "حدد البلدان للبحث",
+            "subtitle": "حدد تفضيلاتك"
+        },
+        "display": {
+            "title": "إعدادات العرض",
+            "shipping": "حساب الشحن",
+            "flags": "عرض أعلام البلدان",
+            "savings": "عرض نسبة التوفير"
+        },
+        "currency": {
+            "title": "إعدادات العملة"
+        },
+        "language": {
+            "title": "اللغة",
+            "select": "اختر اللغة"
+        }
+    }
+}

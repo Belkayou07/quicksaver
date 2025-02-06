@@ -1,0 +1,22 @@
+{
+    "settings": {
+        "title": "Paramètres Quick-Saver",
+        "regions": {
+            "title": "Sélectionnez les pays à rechercher",
+            "subtitle": "Sélectionnez vos préférences"
+        },
+        "display": {
+            "title": "Paramètres d'affichage",
+            "shipping": "Calculer les frais de port",
+            "flags": "Afficher les drapeaux des pays",
+            "savings": "Afficher le pourcentage d'économies"
+        },
+        "currency": {
+            "title": "Paramètres de devise"
+        },
+        "language": {
+            "title": "Langue",
+            "select": "Sélectionner la langue"
+        }
+    }
+}

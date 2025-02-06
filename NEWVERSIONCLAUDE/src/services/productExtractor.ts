@@ -12,6 +12,15 @@ export class ProductExtractor {
     'span[data-a-color="price"]'
   ];
 
+  private static readonly shippingSelectors = [
+    '#deliveryBlock_feature_div .a-color-base', // Standard shipping block
+    '#mir-layout-DELIVERY_BLOCK .a-color-base', // Modern shipping block
+    '#delivery-message', // Delivery message
+    '#ourprice_shippingmessage .a-color-base', // Shipping message under price
+    '.shipping-message-price', // Generic shipping price
+    '[data-csa-c-delivery-price]', // Delivery price data attribute
+  ];
+
   private static getCurrentMarketplace(): string | null {
     const hostname = window.location.hostname;
     const marketplaceDomain = hostname.replace('www.', '');
@@ -60,6 +69,31 @@ export class ProductExtractor {
     }
 
     return price;
+  }
+
+  private static extractShippingCost(): number | undefined {
+    for (const selector of this.shippingSelectors) {
+      const element = document.querySelector(selector);
+      if (!element) continue;
+
+      const text = element.textContent?.toLowerCase() || '';
+      
+      // Free shipping
+      if (text.includes('free shipping') || text.includes('free delivery')) {
+        return 0;
+      }
+
+      // Try to find a shipping cost in the text
+      const matches = text.match(/(?:shipping|delivery)(?:[^0-9€$£¥]*)((?:\d+[,.])*\d+)/i);
+      if (matches && matches[1]) {
+        const cost = parseFloat(matches[1].replace(',', '.'));
+        if (!isNaN(cost)) {
+          return cost;
+        }
+      }
+    }
+
+    return undefined;
   }
 
   // New method to extract initial info before page load
@@ -114,6 +148,7 @@ export class ProductExtractor {
     const priceElement = this.findPriceElement();
     const titleElement = document.querySelector('#productTitle');
     const price = this.extractPrice(priceElement);
+    const shippingCost = this.extractShippingCost();
 
     if (!price) {
       console.error('Could not extract price');
@@ -131,7 +166,8 @@ export class ProductExtractor {
       currentPrice: price,
       currency: marketplaceInfo.currency,
       marketplace: marketplace,
-      url: window.location.href
+      url: window.location.href,
+      shippingCost
     };
 
     console.log('Successfully extracted product:', product);

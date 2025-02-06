@@ -139,6 +139,33 @@ async function getCachedComparison(product: AmazonProduct) {
   return null;
 }
 
+// Set up sidepanel behavior
+chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
+
+// Function to set panel width
+const setPanelWidth = () => {
+  chrome.windows.getCurrent((window) => {
+    if (window.id) {
+      chrome.windows.update(window.id, {
+        width: 398
+      });
+    }
+  });
+};
+
+// Handle extension icon click
+chrome.action.onClicked.addListener((tab) => {
+  if (tab.id) {
+    setPanelWidth();
+  }
+});
+
+// Initialize side panel behavior when extension loads
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
+  setPanelWidth();
+});
+
 // Set up alarm for periodic price checks and cache cleanup
 chrome.alarms.create('checkPrices', { periodInMinutes: 30 });
 chrome.alarms.create('cleanupCache', { periodInMinutes: 60 });
@@ -177,17 +204,4 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
       }
     }
   }
-});
-
-// Handle extension icon click to toggle side panel
-chrome.action.onClicked.addListener(async (tab) => {
-  if (tab.id) {
-    // Set the initial state of the side panel if not already set
-    await chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
-  }
-});
-
-// Initialize side panel behavior when extension loads
-chrome.runtime.onInstalled.addListener(async () => {
-  await chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
 });

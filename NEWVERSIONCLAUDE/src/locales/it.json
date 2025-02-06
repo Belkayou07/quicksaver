@@ -1,0 +1,22 @@
+{
+    "settings": {
+        "title": "Impostazioni Quick-Saver",
+        "regions": {
+            "title": "Seleziona i paesi da cercare",
+            "subtitle": "Seleziona le tue preferenze"
+        },
+        "display": {
+            "title": "Impostazioni di visualizzazione",
+            "shipping": "Calcola spedizione",
+            "flags": "Mostra bandiere dei paesi",
+            "savings": "Mostra percentuale di risparmio"
+        },
+        "currency": {
+            "title": "Impostazioni valuta"
+        },
+        "language": {
+            "title": "Lingua",
+            "select": "Seleziona lingua"
+        }
+    }
+}

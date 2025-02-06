@@ -1,0 +1,22 @@
+{
+    "settings": {
+        "title": "Quick-Saver设置",
+        "regions": {
+            "title": "选择要搜索的国家",
+            "subtitle": "选择您的偏好设置"
+        },
+        "display": {
+            "title": "显示设置",
+            "shipping": "计算运费",
+            "flags": "显示国旗",
+            "savings": "显示节省百分比"
+        },
+        "currency": {
+            "title": "货币设置"
+        },
+        "language": {
+            "title": "语言",
+            "select": "选择语言"
+        }
+    }
+}

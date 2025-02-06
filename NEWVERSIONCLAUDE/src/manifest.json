@@ -2,12 +2,14 @@
   "manifest_version": 3,
   "name": "Quick-Saver",
   "version": "1.0.0",
-  "description": "Find the best prices across Amazon marketplaces",
+  "description": "Find better prices across Amazon's regional marketplaces",
   "permissions": [
+    "activeTab",
     "storage",
+    "sidePanel",
     "alarms",
     "notifications",
-    "sidePanel"
+    "windows"
   ],
   "host_permissions": [
     "*://*.amazon.com.au/*",
@@ -67,10 +69,18 @@
     "type": "module"
   },
   "side_panel": {
-    "default_path": "sidepanel.html"
+    "default_path": "sidepanel.html",
+    "default_width": 320
   },
+  "minimum_chrome_version": "114",
   "action": {
-    "default_title": "Quick-Saver"
+    "default_title": "Quick-Saver",
+    "default_icon": {
+      "16": "assets/icon16.png",
+      "32": "assets/icon32.png",
+      "48": "assets/icon48.png",
+      "128": "assets/icon128.png"
+    }
   },
   "icons": {
     "16": "assets/icon16.png",

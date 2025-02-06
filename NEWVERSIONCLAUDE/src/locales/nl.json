@@ -1,0 +1,22 @@
+{
+    "settings": {
+        "title": "Quick-Saver Instellingen",
+        "regions": {
+            "title": "Selecteer landen om te zoeken",
+            "subtitle": "Selecteer uw voorkeuren"
+        },
+        "display": {
+            "title": "Weergave-instellingen",
+            "shipping": "Verzendkosten berekenen",
+            "flags": "Landvlaggen weergeven",
+            "savings": "Besparingspercentage weergeven"
+        },
+        "currency": {
+            "title": "Valuta-instellingen"
+        },
+        "language": {
+            "title": "Taal",
+            "select": "Selecteer taal"
+        }
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "settings": {
+        "title": "Quick-Saver Settings",
+        "regions": {
+            "title": "Select which countries to search",
+            "subtitle": "Select your preferences"
+        },
+        "display": {
+            "title": "Display Settings",
+            "shipping": "Calculate Shipping",
+            "flags": "Show Country Flags",
+            "savings": "Show Price Savings Percentage"
+        },
+        "currency": {
+            "title": "Currency Settings"
+        },
+        "language": {
+            "title": "Language",
+            "select": "Select Language"
+        }
+    }
+}
