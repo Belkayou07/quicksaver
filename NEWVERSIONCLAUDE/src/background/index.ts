@@ -2,47 +2,37 @@
 import { browser } from 'webextension-polyfill-ts';
 
 // Listen for installation
-browser.runtime.onInstalled.addListener(() => {
+browser.runtime.onInstalled.addListener(async () => {
   console.log('Quick-Saver extension installed');
 });
 
-// Handle fetch requests from content script
+// Handle messages from content script
 browser.runtime.onMessage.addListener(async (message: any) => {
   try {
-    if (message.type === '_execute_browser_action') {
-      // @ts-ignore - Chrome specific API
-      chrome.action.openPopup();
-      return { success: true };
-    }
-
-    if (message.type === 'TOGGLE_PANEL') {
-      try {
-        // @ts-ignore - Chrome specific API
-        const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-        if (!tabs[0]?.id) {
-          throw new Error('No active tab found');
-        }
-
-        // Configure the sidepanel first
-        // @ts-ignore - Chrome specific API
-        await chrome.sidePanel.setOptions({
-          tabId: tabs[0].id,
-          path: 'sidepanel.html',
-          enabled: true
-        });
-
-        // Focus the current window to ensure the user gesture context is maintained
-        await chrome.windows.update(tabs[0].windowId, { focused: true });
-
-        // Open the sidepanel
-        // @ts-ignore - Chrome specific API
-        await chrome.action.openPopup();
-
-        return { success: true };
-      } catch (error) {
-        console.error('Error with sidepanel:', error);
-        return { success: false, error: error instanceof Error ? error.message : 'Failed to handle sidepanel' };
+    if (message.type === 'CLICK_EXTENSION') {
+      // Get current window to position the popup
+      const [currentWindow] = await chrome.windows.getAll({ windowTypes: ['normal'], populate: true });
+      if (!currentWindow?.id) {
+        throw new Error('No window found');
       }
+
+      // Get window details
+      const window = await chrome.windows.get(currentWindow.id);
+      
+      // Fixed width but full height
+      const width = 300;
+
+      // Create popup positioned on the right side
+      await chrome.windows.create({
+        url: chrome.runtime.getURL('popup.html'),
+        type: 'popup',
+        width,
+        height: window.height,
+        top: window.top,
+        left: window.left! + window.width! - width, // Position on right side
+        focused: true
+      });
+      return { success: true };
     }
 
     if (message.type === 'FETCH_URL') {
@@ -50,30 +40,46 @@ browser.runtime.onMessage.addListener(async (message: any) => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const text = await response.text();
-      return { success: true, data: text };
+      return { success: true, data: await response.text() };
     }
-    
+
     if (message.type === 'FETCH_EXCHANGE_RATES') {
       try {
         const response = await fetch(message.url);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
-        return data; // The API already returns { rates: { ... } }
+        return await response.json();
       } catch (error) {
-        console.error('Error in background script:', error);
-        throw error;
+        throw console.error('Error in background script:', error);
       }
     }
 
     return { success: false, error: 'Unknown message type' };
   } catch (error) {
     console.error('Error in background script:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'An unknown error occurred'
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'An unknown error occurred',
     };
   }
 });
+
+async function toggleSidepanel() {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab?.id) {
+      throw new Error('No active tab found');
+    }
+
+    // Configure and enable the sidepanel
+    await chrome.sidePanel.setOptions({
+      tabId: tab.id,
+      path: 'sidepanel.html',
+      enabled: true
+    });
+  } catch (error) {
+    console.error('Error toggling sidepanel:', error);
+    throw error;
+  }
+}

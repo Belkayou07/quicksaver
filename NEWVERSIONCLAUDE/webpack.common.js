@@ -6,7 +6,8 @@ module.exports = {
   entry: {
     background: './src/background/index.ts',
     contentScript: './src/content/index.tsx',
-    sidepanel: './src/sidepanel/index.tsx'
+    sidepanel: './src/sidepanel/index.tsx',
+    popup: './src/popup/index.tsx'
   },
   module: {
     rules: [
@@ -38,6 +39,11 @@ module.exports = {
       template: './src/sidepanel/index.html',
       filename: 'sidepanel.html',
       chunks: ['sidepanel'],
+    }),
+    new HtmlWebpackPlugin({
+      template: './src/popup/index.html',
+      filename: 'popup.html',
+      chunks: ['popup'],
     }),
     new CopyPlugin({
       patterns: [

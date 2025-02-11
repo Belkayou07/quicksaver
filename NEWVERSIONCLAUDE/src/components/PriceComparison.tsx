@@ -32,15 +32,9 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
     return chrome.runtime.getURL(`assets/flags/${countryCode.toLowerCase()}.png`);
   };
 
-  const openSidepanel = async () => {
-    try {
-      const response = await chrome.runtime.sendMessage({ type: 'TOGGLE_PANEL' });
-      if (!response.success) {
-        console.error('Failed to open sidepanel:', response.error);
-      }
-    } catch (error) {
-      console.error('Error sending message:', error);
-    }
+  const openSidepanel = () => {
+    // Send message to background script to handle popup
+    chrome.runtime.sendMessage({ type: 'CLICK_EXTENSION' });
   };
 
   return (

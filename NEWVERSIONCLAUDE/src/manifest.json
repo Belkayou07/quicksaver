@@ -20,7 +20,11 @@
       "32": "assets/icon32.png",
       "48": "assets/icon48.png",
       "128": "assets/icon128.png"
-    }
+    },
+    "default_popup": "popup.html"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
   },
   "host_permissions": [
     "*://*.amazon.com.be/*",
@@ -49,17 +53,12 @@
         "*://*.amazon.com.tr/*",
         "*://*.amazon.co.uk/*"
       ],
-      "js": ["contentScript.js"],
-      "permissions": ["sidePanel"]
+      "js": ["contentScript.js"]
     }
   ],
   "background": {
     "service_worker": "background.js",
     "type": "module"
-  },
-  "side_panel": {
-    "default_path": "sidepanel.html",
-    "default_width": 320
   },
   "minimum_chrome_version": "114",
   "icons": {
@@ -69,7 +68,12 @@
     "128": "assets/icon128.png"
   },
   "commands": {
-    "_execute_action": {},
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S"
+      },
+      "description": "Toggle Quick-Saver Settings"
+    },
     "toggle-sidepanel": {
       "description": "Toggle the sidepanel"
     }
