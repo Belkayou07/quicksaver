@@ -2,66 +2,55 @@
   "manifest_version": 3,
   "name": "Quick-Saver",
   "version": "1.0.0",
-  "description": "Find better prices across Amazon's regional marketplaces",
+  "description": "Find better prices across Amazon's European marketplaces",
   "permissions": [
     "activeTab",
     "storage",
     "sidePanel",
     "alarms",
     "notifications",
-    "windows"
+    "windows",
+    "commands",
+    "tabs"
   ],
+  "action": {
+    "default_title": "Quick-Saver Settings",
+    "default_icon": {
+      "16": "assets/icon16.png",
+      "32": "assets/icon32.png",
+      "48": "assets/icon48.png",
+      "128": "assets/icon128.png"
+    }
+  },
   "host_permissions": [
-    "*://*.amazon.com.au/*",
     "*://*.amazon.com.be/*",
-    "*://*.amazon.com.br/*",
-    "*://*.amazon.ca/*",
-    "*://*.amazon.cn/*",
-    "*://*.amazon.eg/*",
     "*://*.amazon.fr/*",
     "*://*.amazon.de/*",
-    "*://*.amazon.in/*",
     "*://*.amazon.it/*",
-    "*://*.amazon.co.jp/*",
-    "*://*.amazon.com.mx/*",
     "*://*.amazon.nl/*",
     "*://*.amazon.pl/*",
-    "*://*.amazon.sa/*",
-    "*://*.amazon.sg/*",
     "*://*.amazon.es/*",
     "*://*.amazon.se/*",
     "*://*.amazon.com.tr/*",
-    "*://*.amazon.ae/*",
     "*://*.amazon.co.uk/*",
-    "*://*.amazon.com/*"
+    "https://api.exchangerate-api.com/*"
   ],
   "content_scripts": [
     {
       "matches": [
-        "*://*.amazon.com.au/*",
         "*://*.amazon.com.be/*",
-        "*://*.amazon.com.br/*",
-        "*://*.amazon.ca/*",
-        "*://*.amazon.cn/*",
-        "*://*.amazon.eg/*",
         "*://*.amazon.fr/*",
         "*://*.amazon.de/*",
-        "*://*.amazon.in/*",
         "*://*.amazon.it/*",
-        "*://*.amazon.co.jp/*",
-        "*://*.amazon.com.mx/*",
         "*://*.amazon.nl/*",
         "*://*.amazon.pl/*",
-        "*://*.amazon.sa/*",
-        "*://*.amazon.sg/*",
         "*://*.amazon.es/*",
         "*://*.amazon.se/*",
         "*://*.amazon.com.tr/*",
-        "*://*.amazon.ae/*",
-        "*://*.amazon.co.uk/*",
-        "*://*.amazon.com/*"
+        "*://*.amazon.co.uk/*"
       ],
-      "js": ["contentScript.js"]
+      "js": ["contentScript.js"],
+      "permissions": ["sidePanel"]
     }
   ],
   "background": {
@@ -73,19 +62,33 @@
     "default_width": 320
   },
   "minimum_chrome_version": "114",
-  "action": {
-    "default_title": "Quick-Saver",
-    "default_icon": {
-      "16": "assets/icon16.png",
-      "32": "assets/icon32.png",
-      "48": "assets/icon48.png",
-      "128": "assets/icon128.png"
-    }
-  },
   "icons": {
     "16": "assets/icon16.png",
     "32": "assets/icon32.png",
     "48": "assets/icon48.png",
     "128": "assets/icon128.png"
-  }
+  },
+  "commands": {
+    "_execute_action": {},
+    "toggle-sidepanel": {
+      "description": "Toggle the sidepanel"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/flags/*.png"],
+      "matches": [
+        "*://*.amazon.com.be/*",
+        "*://*.amazon.fr/*",
+        "*://*.amazon.de/*",
+        "*://*.amazon.it/*",
+        "*://*.amazon.nl/*",
+        "*://*.amazon.pl/*",
+        "*://*.amazon.es/*",
+        "*://*.amazon.se/*",
+        "*://*.amazon.com.tr/*",
+        "*://*.amazon.co.uk/*"
+      ]
+    }
+  ]
 }

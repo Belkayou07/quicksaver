@@ -1,0 +1,405 @@
+.price-comparison {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(145deg, #151823, #1a1d2d);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.price-comparison.light {
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #000000;
+  box-shadow: none;
+}
+
+.price-comparison h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.light h3 {
+  color: #000000;
+}
+
+.price-comparison-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.header-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.settings-toggle,
+.theme-toggle {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: inherit;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.settings-toggle:hover,
+.theme-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.light .settings-toggle:hover,
+.light .theme-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.light .theme-toggle {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #1a1a1a;
+}
+
+.price-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+}
+
+.price-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  text-decoration: none !important;
+  color: inherit;
+  transition: all 0.2s ease;
+  position: relative;
+  border-left: 4px solid transparent;
+  background-color: #2a2a2a;
+}
+
+.light .price-item {
+  background-color: transparent;
+  color: #000000;
+}
+
+.light .price-item:last-child {
+  border-bottom: none;
+}
+
+.price-item.lower {
+  background: rgba(34, 197, 94, 0.3);
+  border-left-color: #22c55e;
+}
+
+.light .price-item.lower {
+  background: rgba(34, 197, 94, 0.3);
+  border-left-color: #00a000;
+}
+
+.price-item.same {
+  background: rgba(255, 255, 255, 0.15);
+  border-left-color: #6b7280;
+}
+
+.light .price-item.same {
+  background: rgba(102, 102, 102, 0.15);
+  border-left-color: #666666;
+}
+
+.price-item.higher {
+  background: rgba(239, 68, 68, 0.3);
+  border-left-color: #ef4444;
+}
+
+.light .price-item.higher {
+  background: rgba(239, 68, 68, 0.3);
+  border-left-color: #ff0000;
+}
+
+.price-item:hover,
+.price-item:focus,
+.price-item:active,
+.price-item:visited {
+  text-decoration: none !important;
+  color: inherit;
+}
+
+.price-item:hover {
+  transform: translateX(2px);
+  background-color: #333333;
+}
+
+.light .price-item:hover {
+  background-color: #f5f5f5;
+}
+
+.marketplace {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.flag {
+  width: 20px;
+  height: 15px;
+  object-fit: cover;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.country-code {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: #ffffff !important;
+  text-decoration: none !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.light .country-code {
+  color: #000000 !important;
+}
+
+.price-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 16px;
+  flex: 1;
+  min-width: 0;
+  gap: 8px;
+}
+
+.price-details > * {
+  white-space: nowrap;
+}
+
+.price-details .base-price {
+  text-align: right;
+  min-width: 50px;
+  flex: 1;
+}
+
+.price-details .shipping-value {
+  text-align: right;
+  min-width: 50px;
+  flex: 1;
+}
+
+.price-details .total {
+  text-align: right;
+  min-width: 50px;
+  flex: 1;
+}
+
+.price-details .shipping,
+.price-details .equals {
+  text-align: center;
+  width: 10px;
+  opacity: 0.7;
+  flex: 0 0 auto;
+}
+
+.base-price {
+  font-weight: 500;
+  font-size: 14px;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.shipping {
+  color: #8b8f96;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.shipping-value {
+  color: #8b8f96;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.equals {
+  color: #8b8f96;
+  font-size: 14px;
+}
+
+.total {
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.difference {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  width: 60px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.difference.lower {
+  background-color: #22c55e33;
+  color: #22c55e;
+}
+
+.light .difference.lower {
+  background-color: #22c55e33;
+  color: #22c55e;
+}
+
+.difference.same {
+  background-color: #6b728033;
+  color: #6b7280;
+}
+
+.light .difference.same {
+  background-color: #6b728033;
+  color: #6b7280;
+}
+
+.difference.higher {
+  background-color: #ef444433;
+  color: #ef4444;
+}
+
+.light .difference.higher {
+  background-color: #ef444433;
+  color: #ef4444;
+}
+
+.light .base-price,
+.light .shipping,
+.light .shipping-value,
+.light .equals,
+.light .total {
+  color: #000000;
+}
+
+.light .shipping,
+.light .equals {
+  opacity: 0.85;
+}
+
+.footer-note {
+  font-size: 12px;
+  opacity: 0.7;
+  text-align: center;
+  margin-top: 12px;
+}
+
+.light .footer-note {
+  color: #000000;
+  opacity: 0.85;
+}
+
+/* Responsive layouts */
+@media (min-width: 481px) {
+  .price-item {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 480px) {
+  .price-item {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .marketplace {
+    width: 50px;
+    margin-right: 8px;
+  }
+
+  .price-details {
+    gap: 4px;
+  }
+
+  .price-details .base-price,
+  .price-details .shipping-value,
+  .price-details .total {
+    min-width: 50px;
+  }
+
+  .price-details .shipping,
+  .price-details .equals {
+    width: 15px;
+  }
+
+  .difference {
+    width: 100%;
+    text-align: right;
+    margin-top: 4px;
+  }
+}
+
+@media (max-width: 379px) {
+  .price-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .marketplace {
+    width: auto;
+    margin-bottom: 4px;
+  }
+
+  .price-details {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 20px auto;
+    gap: 4px;
+  }
+
+  .price-details .equals,
+  .price-details .total {
+    display: none;
+  }
+
+  .shipping-value::after {
+    content: " = " attr(data-total);
+    white-space: nowrap;
+  }
+
+  .difference {
+    width: 100%;
+    text-align: right;
+  }
+}

@@ -1,28 +1,19 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { MARKETPLACES } from '../config/marketplaces';
 
 interface MarketplaceState {
-  enabledMarketplaces: string[];
+  selectedMarketplaces: string[];
+  setSelectedMarketplaces: (marketplaces: string[]) => void;
   toggleMarketplace: (marketplace: string) => void;
-  setEnabledMarketplaces: (marketplaces: string[]) => void;
 }
 
-export const useMarketplaceStore = create<MarketplaceState>()(
-  persist(
-    (set) => ({
-      enabledMarketplaces: Object.keys(MARKETPLACES), // All marketplaces enabled by default
-      toggleMarketplace: (marketplace) =>
-        set((state) => ({
-          enabledMarketplaces: state.enabledMarketplaces.includes(marketplace)
-            ? state.enabledMarketplaces.filter((m) => m !== marketplace)
-            : [...state.enabledMarketplaces, marketplace],
-        })),
-      setEnabledMarketplaces: (marketplaces) =>
-        set({ enabledMarketplaces: marketplaces }),
-    }),
-    {
-      name: 'marketplace-storage',
-    }
-  )
-);
+export const useMarketplaceStore = create<MarketplaceState>((set) => ({
+  selectedMarketplaces: Object.keys(MARKETPLACES),
+  setSelectedMarketplaces: (marketplaces) => set({ selectedMarketplaces: marketplaces }),
+  toggleMarketplace: (marketplace) =>
+    set((state) => ({
+      selectedMarketplaces: state.selectedMarketplaces.includes(marketplace)
+        ? state.selectedMarketplaces.filter((m) => m !== marketplace)
+        : [...state.selectedMarketplaces, marketplace],
+    })),
+}));

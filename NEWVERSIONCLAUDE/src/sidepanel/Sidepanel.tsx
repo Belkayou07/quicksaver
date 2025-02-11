@@ -39,7 +39,7 @@ const currencies = [
 
 export const Sidepanel: React.FC = () => {
     const { t, i18n } = useTranslation();
-    const { enabledMarketplaces, toggleMarketplace } = useMarketplaceStore();
+    const { selectedMarketplaces, toggleMarketplace } = useMarketplaceStore();
     const { theme, toggleTheme } = useThemeStore();
     const [settings, setSettings] = useState({
         currencyCode: 'USD',
@@ -56,7 +56,7 @@ export const Sidepanel: React.FC = () => {
         }));
     };
 
-    const isCountryEnabled = (domain: string) => enabledMarketplaces.includes(domain);
+    const isCountryEnabled = (domain: string) => selectedMarketplaces.includes(domain);
 
     const languages = {
         en: 'English',
