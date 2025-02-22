@@ -2,21 +2,49 @@
     "settings": {
         "title": "Quick-Saver Settings",
         "regions": {
-            "title": "Select which countries to search",
+            "title": "Select countries to search",
             "subtitle": "Select your preferences"
         },
         "display": {
             "title": "Display Settings",
-            "shipping": "Calculate Shipping",
-            "flags": "Show Country Flags",
-            "savings": "Show Price Savings Percentage"
+            "shipping": "Calculate shipping",
+            "flags": "Show flags",
+            "savings": "Savings indicator"
         },
         "currency": {
-            "title": "Currency Settings"
+            "title": "Currency"
         },
         "language": {
             "title": "Language",
             "select": "Select Language"
         }
+    },
+    "countries": {
+        "Belgium": "Belgium",
+        "France": "France",
+        "Germany": "Germany",
+        "Italy": "Italy",
+        "Netherlands": "Netherlands",
+        "Poland": "Poland",
+        "Spain": "Spain",
+        "Sweden": "Sweden",
+        "UK": "UK"
+    },
+    "priceComparison": {
+        "title": "Alternative Prices",
+        "footerNote": "Prices include currency conversion and shipping",
+        "shipping": "Shipping",
+        "total": "Total",
+        "difference": "Difference",
+        "cheapestOption": "Cheapest option",
+        "currentPrice": "Current price",
+        "noAlternatives": "No alternative prices found"
+    },
+    "common": {
+        "freeShipping": "Free",
+        "openSettings": "Open settings",
+        "toggleTheme": "Switch to {{mode}} mode",
+        "countryFlag": "{{country}} flag",
+        "visitStore": "Visit store"
     }
 }

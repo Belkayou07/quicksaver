@@ -1,0 +1,49 @@
+{
+  "settings": {
+    "title": "Quick-Saver Inställningar",
+    "language": {
+      "title": "Språk"
+    },
+    "display": {
+      "title": "Visningsinställningar",
+      "shipping": "Fraktberäkning",
+      "flags": "Visa flaggor",
+      "savings": "Besparingsindikator"
+    },
+    "currency": {
+      "title": "Valuta"
+    },
+    "regions": {
+      "title": "Välj länder att söka i",
+      "subtitle": "Välj dina preferenser"
+    }
+  },
+  "countries": {
+    "Belgium": "Belgien",
+    "France": "Frankrike",
+    "Germany": "Tyskland",
+    "Italy": "Italien",
+    "Netherlands": "Nederländerna",
+    "Poland": "Polen",
+    "Spain": "Spanien",
+    "Sweden": "Sverige",
+    "UK": "Storbritannien"
+  },
+  "priceComparison": {
+    "title": "Alternativa Priser",
+    "footerNote": "Priserna inkluderar valutaomvandling och frakt",
+    "shipping": "Frakt",
+    "total": "Totalt",
+    "difference": "Skillnad",
+    "cheapestOption": "Billigaste alternativet",
+    "currentPrice": "Nuvarande pris",
+    "noAlternatives": "Inga alternativa priser hittades"
+  },
+  "common": {
+    "freeShipping": "Gratis",
+    "openSettings": "Öppna inställningar",
+    "toggleTheme": "Byt till {{mode}}-läge",
+    "countryFlag": "{{country}} flagga",
+    "visitStore": "Besök butik"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "settings": {
+    "title": "Ustawienia Quick-Saver",
+    "language": {
+      "title": "Język"
+    },
+    "display": {
+      "title": "Ustawienia wyświetlania",
+      "shipping": "Obliczanie kosztów wysyłki",
+      "flags": "Wyświetlaj flagi",
+      "savings": "Wskaźnik oszczędności"
+    },
+    "currency": {
+      "title": "Waluta"
+    },
+    "regions": {
+      "title": "Wybierz kraje do wyszukiwania",
+      "subtitle": "Wybierz swoje preferencje"
+    }
+  },
+  "countries": {
+    "Belgium": "Belgia",
+    "France": "Francja",
+    "Germany": "Niemcy",
+    "Italy": "Włochy",
+    "Netherlands": "Holandia",
+    "Poland": "Polska",
+    "Spain": "Hiszpania",
+    "Sweden": "Szwecja",
+    "UK": "Wielka Brytania"
+  },
+  "priceComparison": {
+    "title": "Alternatywne Ceny",
+    "footerNote": "Ceny zawierają przelicznik walut i wysyłkę",
+    "shipping": "Wysyłka",
+    "total": "Suma",
+    "difference": "Różnica",
+    "cheapestOption": "Najtańsza opcja",
+    "currentPrice": "Obecna cena",
+    "noAlternatives": "Nie znaleziono alternatywnych cen"
+  },
+  "common": {
+    "freeShipping": "Darmowa",
+    "openSettings": "Otwórz ustawienia",
+    "toggleTheme": "Przełącz na tryb {{mode}}",
+    "countryFlag": "Flaga {{country}}",
+    "visitStore": "Odwiedź sklep"
+  }
+}

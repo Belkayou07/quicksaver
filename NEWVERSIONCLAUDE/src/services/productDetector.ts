@@ -5,7 +5,24 @@ export class ProductDetector {
    * Detects if current page is an Amazon product page
    */
   public static isProductPage(url: string): boolean {
-    return url.includes('/dp/') || url.includes('/gp/product/');
+    // First check URL patterns
+    const isProductUrl = url.includes('/dp/') || 
+                        url.includes('/gp/product/') ||
+                        url.includes('/d/') ||  // Some marketplaces use this format
+                        /\/[A-Z0-9]{10}(?:\/|\?|$)/.test(url);
+
+    if (!isProductUrl) {
+      return false;
+    }
+
+    // Additional check for product page elements
+    const hasProductElements = 
+      document.querySelector('#productTitle') !== null ||
+      document.querySelector('#product-title') !== null ||
+      document.querySelector('[data-feature-name="title"]') !== null ||
+      document.querySelector('.product-title-word-break') !== null;
+
+    return hasProductElements;
   }
 
   /**
@@ -47,31 +64,53 @@ export class ProductDetector {
     shipping: number | null;
   } {
     const title = document.querySelector('#productTitle')?.textContent?.trim() || '';
+    console.log('[DEBUG] Found title:', title);
     
     // Comprehensive price selectors for different marketplace layouts
     const priceSelectors = [
-      '.a-price .a-offscreen',                    // Most common modern layout
-      '#priceblock_ourprice',                     // Classic layout
-      '#priceblock_dealprice',                    // Deal price
-      '#price_inside_buybox',                     // Buy box price
-      '#newBuyBoxPrice',                          // New buy box layout
-      '#corePrice_feature_div .a-price-whole',    // Newer layout whole price
+      '.priceToPay .a-offscreen',                // Priority price
+      '.a-price .a-offscreen',                   // Most common modern layout
+      '#priceblock_ourprice',                    // Classic layout
+      '#priceblock_dealprice',                   // Deal price
+      '#price_inside_buybox',                    // Buy box price
+      '#newBuyBoxPrice',                         // New buy box layout
+      '#corePrice_feature_div .a-price-whole',   // Newer layout whole price
       '.price-info-supersize .a-price .a-offscreen', // Supersize price display
-      '#price .a-price .a-offscreen',             // Simple price layout
-      '#apex_desktop_newAccordionRow .a-price .a-offscreen' // Apex desktop layout
+      '#price .a-price .a-offscreen',            // Simple price layout
+      '#apex_desktop_newAccordionRow .a-price .a-offscreen', // Apex desktop layout
+      '.a-price[data-a-color="price"] .a-offscreen', // Colored price
+      '#priceblock_saleprice',                   // Sale price
+      '.apexPriceToPay .a-offscreen',           // Apex price to pay
+      '#price .a-text-price .a-offscreen',      // Text price format
+      '.a-price-whole'                          // Fallback to any whole price
     ];
 
     let priceElement = null;
+    let priceText = '';
+    
+    // Try each selector and log what we find
     for (const selector of priceSelectors) {
-      priceElement = document.querySelector(selector);
-      if (priceElement) break;
+      const element = document.querySelector(selector);
+      if (element) {
+        const text = element.textContent?.trim();
+        console.log('[DEBUG] Found price with selector:', selector, 'text:', text);
+        if (text && (!priceText || text.length < priceText.length)) {
+          priceElement = element;
+          priceText = text;
+        }
+      }
     }
 
-    const priceText = priceElement?.textContent || '';
+    if (!priceElement) {
+      console.log('[DEBUG] No price element found with any selector');
+    }
+
     const price = this.extractNumberFromPrice(priceText);
+    console.log('[DEBUG] Extracted price number:', price);
     
     // Get currency symbol/code
     const currency = this.extractCurrencyCode(priceText);
+    console.log('[DEBUG] Extracted currency:', currency);
     
     // Comprehensive shipping selectors
     const shippingSelectors = [

@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MARKETPLACES } from '../config/marketplaces';
 import { useMarketplaceStore } from '../store/marketplaceStore';
 import { useThemeStore } from '../store/themeStore';
+import { useLanguageStore } from '../store/languageStore';
+import { useSettingsStore } from '../store/settingsStore';
 import '../i18n/config';
 
 // Convert marketplace data to country format
@@ -15,63 +17,63 @@ const countries = Object.entries(MARKETPLACES).map(([domain, info]) => {
     
     return {
         code,
-        name: info.region,
+        name: info.name, // Use country name instead of region
         flag: `${code.toLowerCase()}.png`,
         domain
     };
 });
 
-// Currency options with symbols
+// Currency options with symbols - only used currencies
 const currencies = [
-    { code: 'USD', symbol: '$' },
     { code: 'EUR', symbol: '€' },
     { code: 'GBP', symbol: '£' },
-    { code: 'JPY', symbol: '¥' },
-    { code: 'AUD', symbol: 'A$' },
-    { code: 'CAD', symbol: 'C$' },
-    { code: 'CNY', symbol: '¥' },
-    { code: 'AED', symbol: 'د.إ' },
-    { code: 'BRL', symbol: 'R$' },
-    { code: 'INR', symbol: '₹' },
-    { code: 'MXN', symbol: '$' },
-    { code: 'SGD', symbol: 'S$' }
+    { code: 'PLN', symbol: 'zł' },
+    { code: 'SEK', symbol: 'kr' }
 ];
 
+// Languages from our marketplaces only
+const languages = {
+    en: 'English',    // UK
+    nl: 'Nederlands', // Netherlands, Belgium
+    fr: 'Français',   // France, Belgium
+    de: 'Deutsch',    // Germany
+    it: 'Italiano',   // Italy
+    pl: 'Polski',     // Poland
+    es: 'Español',    // Spain
+    sv: 'Svenska'     // Sweden
+};
+
 export const Sidepanel: React.FC = () => {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const { selectedMarketplaces, toggleMarketplace } = useMarketplaceStore();
-    const { theme, toggleTheme } = useThemeStore();
-    const [settings, setSettings] = useState({
-        currencyCode: 'USD',
-        priceComparisonEnabled: true,
-        shippingCalculationEnabled: false,
-        flagDisplayEnabled: true,
-        priceIndicatorEnabled: true,
-    });
+    const { theme, loadTheme } = useThemeStore();
+    const { language, loadLanguage } = useLanguageStore();
+    const { 
+        priceComparisonEnabled,
+        shippingCalculationEnabled,
+        flagDisplayEnabled,
+        priceIndicatorEnabled,
+        currencyCode,
+        setSettings,
+        loadSettings
+    } = useSettingsStore();
+
+    useEffect(() => {
+        // Load all settings on mount
+        loadSettings();
+        loadTheme();
+        loadLanguage();
+    }, [loadSettings, loadTheme, loadLanguage]);
 
     const handleSettingChange = (setting: string, value: boolean | string) => {
-        setSettings(prev => ({
-            ...prev,
-            [setting]: value
-        }));
+        setSettings({ [setting]: value });
     };
 
     const isCountryEnabled = (domain: string) => selectedMarketplaces.includes(domain);
 
-    const languages = {
-        en: 'English',
-        de: 'Deutsch',
-        fr: 'Français',
-        es: 'Español',
-        it: 'Italiano',
-        ja: '日本語',
-        'zh-CN': '简体中文',
-        ar: 'العربية',
-        nl: 'Nederlands'
-    };
-
     const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        i18n.changeLanguage(event.target.value);
+        const newLang = event.target.value;
+        chrome.storage.local.set({ language: newLang });
     };
 
     return (
@@ -79,9 +81,16 @@ export const Sidepanel: React.FC = () => {
             <header className="sidepanel-header">
                 <div className="header-content">
                     <button 
-                        className="power-button"
-                        onClick={() => handleSettingChange('priceComparisonEnabled', !settings.priceComparisonEnabled)}
-                        aria-label={settings.priceComparisonEnabled ? 'Turn Off' : 'Turn On'}
+                        className={`power-button ${priceComparisonEnabled ? 'on' : 'off'}`}
+                        onClick={() => {
+                            handleSettingChange('priceComparisonEnabled', !priceComparisonEnabled);
+                            // Send message to background script to update display
+                            chrome.runtime.sendMessage({
+                                type: 'UPDATE_PRICE_COMPARISON',
+                                enabled: !priceComparisonEnabled
+                            });
+                        }}
+                        aria-label={priceComparisonEnabled ? 'Turn Off' : 'Turn On'}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
@@ -91,7 +100,10 @@ export const Sidepanel: React.FC = () => {
                     <h1 className="sidepanel-title">{t('settings.title')}</h1>
                     <button 
                         className={`theme-toggle ${theme}-mode`}
-                        onClick={toggleTheme}
+                        onClick={() => {
+                            const newTheme = theme === 'dark' ? 'light' : 'dark';
+                            chrome.storage.local.set({ theme: newTheme });
+                        }}
                         aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
                     >
                         <svg className="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -118,7 +130,7 @@ export const Sidepanel: React.FC = () => {
                     <h2 className="settings-section-title">{t('settings.language.title')}</h2>
                     <div className="language-selector">
                         <select 
-                            value={i18n.language} 
+                            value={language} 
                             onChange={handleLanguageChange}
                             className="language-select"
                         >
@@ -140,7 +152,7 @@ export const Sidepanel: React.FC = () => {
                             <label className="toggle-switch">
                                 <input
                                     type="checkbox"
-                                    checked={settings.shippingCalculationEnabled}
+                                    checked={shippingCalculationEnabled}
                                     onChange={(e) => handleSettingChange('shippingCalculationEnabled', e.target.checked)}
                                 />
                                 <span className="toggle-slider"></span>
@@ -151,7 +163,7 @@ export const Sidepanel: React.FC = () => {
                             <label className="toggle-switch">
                                 <input
                                     type="checkbox"
-                                    checked={settings.flagDisplayEnabled}
+                                    checked={flagDisplayEnabled}
                                     onChange={(e) => handleSettingChange('flagDisplayEnabled', e.target.checked)}
                                 />
                                 <span className="toggle-slider"></span>
@@ -162,7 +174,7 @@ export const Sidepanel: React.FC = () => {
                             <label className="toggle-switch">
                                 <input
                                     type="checkbox"
-                                    checked={settings.priceIndicatorEnabled}
+                                    checked={priceIndicatorEnabled}
                                     onChange={(e) => handleSettingChange('priceIndicatorEnabled', e.target.checked)}
                                 />
                                 <span className="toggle-slider"></span>
@@ -177,7 +189,7 @@ export const Sidepanel: React.FC = () => {
                     <div className="currency-selector">
                         <select
                             className="currency-select"
-                            value={settings.currencyCode}
+                            value={currencyCode}
                             onChange={(e) => handleSettingChange('currencyCode', e.target.value)}
                         >
                             {currencies.map(({ code, symbol }) => (
@@ -192,16 +204,15 @@ export const Sidepanel: React.FC = () => {
                 {/* Country Selection */}
                 <section className="settings-section">
                     <h2 className="settings-section-title">{t('settings.regions.title')}</h2>
-                    <p className="settings-section-subtitle">{t('settings.regions.subtitle')}</p>
                     <div className="country-list">
                         {countries.map(country => (
                             <div key={country.code} className="country-item">
                                 <img
                                     src={`assets/flags/${country.flag}`}
-                                    alt={`${country.name} flag`}
+                                    alt={`${t(`countries.${country.name}`)} flag`}
                                     className="country-flag"
                                 />
-                                <span className="country-name">{country.name}</span>
+                                <span className="country-name">{t(`countries.${country.name}`)}</span>
                                 <label className="toggle-switch">
                                     <input
                                         type="checkbox"
@@ -212,7 +223,6 @@ export const Sidepanel: React.FC = () => {
                                 </label>
                             </div>
                         ))}
-                        <div className="bottom-spacer"></div>
                     </div>
                 </section>
             </main>

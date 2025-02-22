@@ -9,7 +9,6 @@ export const MARKETPLACES: { [key: string]: AmazonMarketplace } = {
   'amazon.pl': { domain: 'amazon.pl', currency: 'PLN', region: 'Europe', name: 'Poland' },
   'amazon.es': { domain: 'amazon.es', currency: 'EUR', region: 'Europe', name: 'Spain' },
   'amazon.se': { domain: 'amazon.se', currency: 'SEK', region: 'Europe', name: 'Sweden' },
-  'amazon.com.tr': { domain: 'amazon.com.tr', currency: 'TRY', region: 'Europe', name: 'Turkey' },
   'amazon.co.uk': { domain: 'amazon.co.uk', currency: 'GBP', region: 'Europe', name: 'UK' }
 };
 
@@ -32,7 +31,6 @@ export const marketplaceToCountry: { [key: string]: string } = {
   'amazon.sg': 'SG',
   'amazon.es': 'ES',
   'amazon.se': 'SE',
-  'amazon.com.tr': 'TR',
   'amazon.ae': 'AE',
   'amazon.co.uk': 'GB',
   'amazon.com': 'US'

@@ -234,36 +234,32 @@ body::before {
 }
 
 .power-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border-color);
-    cursor: pointer;
     transition: all 0.2s ease;
-    color: var(--text-bright);
-}
-
-.power-button:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="light"] .power-button {
-    background: rgba(35, 47, 62, 0.05);
-    border-color: var(--amazon-dark);
-    color: var(--amazon-dark);
-}
-
-[data-theme="light"] .power-button:hover {
-    background: rgba(35, 47, 62, 0.1);
 }
 
 .power-button svg {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
+    transition: all 0.2s ease;
+}
+
+.power-button.on {
+    color: rgba(0, 255, 0, 0.8);
+}
+
+.power-button.off {
+    color: rgba(255, 0, 0, 0.8);
+}
+
+.power-button:hover {
+    transform: scale(1.1);
 }
 
 .sidepanel-content {
@@ -569,6 +565,17 @@ body::before {
 
 [data-theme="light"] .toggle-switch input:checked + .toggle-slider:before {
     background-color: #ffffff;
+}
+
+/* Header toggle button states */
+.header-toggle.on {
+    background: rgba(0, 255, 0, 0.1);
+    border-color: rgba(0, 255, 0, 0.2);
+}
+
+.header-toggle.off {
+    background: rgba(255, 0, 0, 0.1);
+    border-color: rgba(255, 0, 0, 0.2);
 }
 
 /* Settings Groups */
@@ -917,6 +924,7 @@ body::before {
     background-position: right var(--spacing-sm) center;
     background-size: 16px;
     padding-right: 32px;
+    font-family: monospace;
 }
 
 [data-theme="light"] .language-select,

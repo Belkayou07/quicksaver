@@ -6,20 +6,31 @@ import PriceComparison from '../components/PriceComparison';
 import '../styles/priceComparison.css';
 
 const injectPriceComparison = async () => {
+  const currentUrl = window.location.href;
+  console.log('[DEBUG] Checking URL:', currentUrl);
+  
   // Check if we're on a product page
-  if (!ProductDetector.isProductPage(window.location.href)) {
+  const isProduct = ProductDetector.isProductPage(currentUrl);
+  console.log('[DEBUG] Is product page:', isProduct);
+  
+  if (!isProduct) {
     return;
   }
 
   // Get ASIN
-  const asin = ProductDetector.extractASIN(window.location.href);
+  const asin = ProductDetector.extractASIN(currentUrl);
+  console.log('[DEBUG] Extracted ASIN:', asin);
+  
   if (!asin) {
     return;
   }
 
   // Get current product info
   const productInfo = ProductDetector.extractProductInfo();
+  console.log('[DEBUG] Product info:', productInfo);
+  
   if (!productInfo.price) {
+    console.log('[DEBUG] No price found in product info');
     return;
   }
 

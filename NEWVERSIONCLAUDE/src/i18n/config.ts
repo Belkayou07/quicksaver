@@ -10,6 +10,8 @@ import ja from '../locales/ja.json';
 import zhCN from '../locales/zh-CN.json';
 import ar from '../locales/ar.json';
 import nl from '../locales/nl.json';
+import pl from '../locales/pl.json';
+import sv from '../locales/sv.json';
 
 const resources = {
   en: { translation: en },
@@ -20,7 +22,9 @@ const resources = {
   ja: { translation: ja },
   'zh-CN': { translation: zhCN },
   ar: { translation: ar },
-  nl: { translation: nl }
+  nl: { translation: nl },
+  pl: { translation: pl },
+  sv: { translation: sv }
 };
 
 i18n

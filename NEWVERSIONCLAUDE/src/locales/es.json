@@ -2,21 +2,49 @@
     "settings": {
         "title": "Configuración de Quick-Saver",
         "regions": {
-            "title": "Seleccione los países a buscar",
+            "title": "Seleccione países para buscar",
             "subtitle": "Seleccione sus preferencias"
         },
         "display": {
             "title": "Configuración de pantalla",
-            "shipping": "Calcular envío",
-            "flags": "Mostrar banderas de países",
-            "savings": "Mostrar porcentaje de ahorro"
+            "shipping": "Cálculo de envío",
+            "flags": "Mostrar banderas",
+            "savings": "Indicador de ahorro"
         },
         "currency": {
-            "title": "Configuración de moneda"
+            "title": "Moneda"
         },
         "language": {
             "title": "Idioma",
             "select": "Seleccionar idioma"
         }
+    },
+    "countries": {
+        "Belgium": "Bélgica",
+        "France": "Francia",
+        "Germany": "Alemania",
+        "Italy": "Italia",
+        "Netherlands": "Países Bajos",
+        "Poland": "Polonia",
+        "Spain": "España",
+        "Sweden": "Suecia",
+        "UK": "Reino Unido"
+    },
+    "priceComparison": {
+        "title": "Precios Alternativos",
+        "footerNote": "Los precios incluyen conversión de moneda y envío",
+        "shipping": "Envío",
+        "total": "Total",
+        "difference": "Diferencia",
+        "cheapestOption": "Opción más barata",
+        "currentPrice": "Precio actual",
+        "noAlternatives": "No se encontraron precios alternativos"
+    },
+    "common": {
+        "freeShipping": "Gratis",
+        "openSettings": "Abrir ajustes",
+        "toggleTheme": "Cambiar a modo {{mode}}",
+        "countryFlag": "Bandera de {{country}}",
+        "visitStore": "Visitar tienda"
     }
 }

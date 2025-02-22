@@ -2,21 +2,45 @@
     "settings": {
         "title": "Paramètres Quick-Saver",
         "regions": {
-            "title": "Sélectionnez les pays à rechercher",
+            "title": "Sélectionner les pays à rechercher",
             "subtitle": "Sélectionnez vos préférences"
         },
         "display": {
             "title": "Paramètres d'affichage",
             "shipping": "Calculer les frais de port",
-            "flags": "Afficher les drapeaux des pays",
-            "savings": "Afficher le pourcentage d'économies"
+            "flags": "Afficher les drapeaux",
+            "savings": "Indicateur d'économies"
         },
         "currency": {
-            "title": "Paramètres de devise"
+            "title": "Devise"
         },
         "language": {
             "title": "Langue",
             "select": "Sélectionner la langue"
         }
+    },
+    "countries": {
+        "Belgium": "Belgique",
+        "France": "France",
+        "Germany": "Allemagne",
+        "Italy": "Italie",
+        "Netherlands": "Pays-Bas",
+        "Poland": "Pologne",
+        "Spain": "Espagne",
+        "Sweden": "Suède",
+        "UK": "Royaume-Uni"
+    },
+    "priceComparison": {
+        "title": "Prix Alternatifs",
+        "footerNote": "Les prix incluent la conversion de devise et les frais de port",
+        "shipping": "Frais de port",
+        "total": "Total",
+        "difference": "Différence"
+    },
+    "common": {
+        "freeShipping": "Gratuit",
+        "openSettings": "Ouvrir les paramètres",
+        "toggleTheme": "Passer en mode {{mode}}",
+        "countryFlag": "Drapeau {{country}}"
     }
 }

@@ -2,21 +2,49 @@
     "settings": {
         "title": "Quick-Saver Einstellungen",
         "regions": {
-            "title": "Wählen Sie die zu durchsuchenden Länder",
+            "title": "Wählen Sie die Länder für die Suche",
             "subtitle": "Wählen Sie Ihre Präferenzen"
         },
         "display": {
             "title": "Anzeigeeinstellungen",
-            "shipping": "Versandkosten berechnen",
-            "flags": "Länderflaggen anzeigen",
-            "savings": "Preisersparnis in Prozent anzeigen"
+            "shipping": "Versandkostenberechnung",
+            "flags": "Flaggen anzeigen",
+            "savings": "Sparanzeige"
         },
         "currency": {
-            "title": "Währungseinstellungen"
+            "title": "Währung"
         },
         "language": {
             "title": "Sprache",
             "select": "Sprache auswählen"
         }
-    }
+    },
+    "countries": {
+        "Belgium": "Belgien",
+        "France": "Frankreich",
+        "Germany": "Deutschland",
+        "Italy": "Italien",
+        "Netherlands": "Niederlande",
+        "Poland": "Polen",
+        "Spain": "Spanien",
+        "Sweden": "Schweden",
+        "UK": "Großbritannien"
+    },
+    "priceComparison": {
+        "title": "Alternative Preise",
+        "footerNote": "Preise inklusive Währungsumrechnung und Versand",
+        "shipping": "Versand",
+        "total": "Gesamt",
+        "difference": "Differenz",
+        "cheapestOption": "Günstigste Option",
+        "currentPrice": "Aktueller Preis",
+        "noAlternatives": "Keine alternativen Preise gefunden"
+    },
+    "common": {
+        "freeShipping": "Kostenlos",
+        "openSettings": "Einstellungen öffnen",
+        "toggleTheme": "Zu {{mode}} Modus wechseln",
+        "countryFlag": "{{country}} Flagge",
+        "visitStore": "Shop besuchen"
+    }    
 }

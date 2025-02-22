@@ -7,8 +7,20 @@ browser.runtime.onInstalled.addListener(async () => {
 });
 
 // Handle messages from content script
-browser.runtime.onMessage.addListener(async (message: any) => {
+browser.runtime.onMessage.addListener(async (message: any, sender: any) => {
   try {
+    if (message.type === 'UPDATE_PRICE_COMPARISON') {
+      // Send message to content script to update price comparison visibility
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tabs[0]?.id) {
+        await chrome.tabs.sendMessage(tabs[0].id, {
+          type: 'TOGGLE_PRICE_COMPARISON',
+          enabled: message.enabled
+        });
+      }
+      return { success: true };
+    }
+
     if (message.type === 'CLICK_EXTENSION') {
       // Get current window to position the popup
       const [currentWindow] = await chrome.windows.getAll({ windowTypes: ['normal'], populate: true });
@@ -19,8 +31,8 @@ browser.runtime.onMessage.addListener(async (message: any) => {
       // Get window details
       const window = await chrome.windows.get(currentWindow.id);
       
-      // Fixed width but full height
-      const width = 300;
+      // Wider popup window
+      const width = 500;
 
       // Create popup positioned on the right side
       await chrome.windows.create({

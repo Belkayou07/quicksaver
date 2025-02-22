@@ -8,15 +8,43 @@
         "display": {
             "title": "Weergave-instellingen",
             "shipping": "Verzendkosten berekenen",
-            "flags": "Landvlaggen weergeven",
-            "savings": "Besparingspercentage weergeven"
+            "flags": "Toon vlaggen",
+            "savings": "Besparingsindicator"
         },
         "currency": {
-            "title": "Valuta-instellingen"
+            "title": "Valuta"
         },
         "language": {
             "title": "Taal",
             "select": "Selecteer taal"
         }
+    },
+    "countries": {
+        "Belgium": "België",
+        "France": "Frankrijk",
+        "Germany": "Duitsland",
+        "Italy": "Italië",
+        "Netherlands": "Nederland",
+        "Poland": "Polen",
+        "Spain": "Spanje",
+        "Sweden": "Zweden",
+        "UK": "Verenigd Koninkrijk"
+    },
+    "priceComparison": {
+        "title": "Alternatieve Prijzen",
+        "footerNote": "Prijzen zijn inclusief valutaomrekening en verzending",
+        "shipping": "Verzending",
+        "total": "Totaal",
+        "difference": "Verschil",
+        "cheapestOption": "Goedkoopste optie",
+        "currentPrice": "Huidige prijs",
+        "noAlternatives": "Geen alternatieve prijzen gevonden"
+    },
+    "common": {
+        "freeShipping": "Gratis",
+        "openSettings": "Instellingen openen",
+        "toggleTheme": "Schakel naar {{mode}} modus",
+        "countryFlag": "{{country}} vlag",
+        "visitStore": "Winkel bezoeken"
     }
 }
