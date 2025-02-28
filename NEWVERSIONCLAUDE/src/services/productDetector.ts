@@ -217,14 +217,31 @@ export class ProductDetector {
       }
     }
 
-    return 'USD'; // Default fallback
+    return 'EUR'; // Default fallback
   }
+
+  private static readonly AFFILIATE_IDS: { [key: string]: string } = {
+    // Belgian marketplace
+    'amazon.com.be': 'azpricecomparisonbe-21',
+    // Other European marketplaces
+    'amazon.fr': 'azpricecomparisonfr-21',
+    'amazon.de': 'azpricecomparisonde-21',
+    'amazon.it': 'azpricecomparisonit-21',
+    'amazon.es': 'azpricecomparisones-21',
+    'amazon.nl': 'azpricecomparisonnl-21',
+    'amazon.pl': 'azpricecomparisonpl-21',
+    'amazon.se': 'azpricecomparisonse-21',
+    // UK marketplace
+    'amazon.co.uk': 'azpricecomparisonuk-21',
+    // Default ID for any other marketplace
+    'default': 'azpricecomparisonbe-21'
+  };
 
   /**
    * Generates affiliate link for a given marketplace and ASIN
    */
   public static generateAffiliateLink(marketplace: string, asin: string): string {
-    const affiliateId = 'azpricecompar-21';
+    const affiliateId = this.AFFILIATE_IDS[marketplace] || this.AFFILIATE_IDS['default'];
     return `https://${marketplace}/dp/${asin}?tag=${affiliateId}`;
   }
 }
