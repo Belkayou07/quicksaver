@@ -228,7 +228,7 @@ export class ProductDetector {
     'amazon.de': 'azpricecomparisonde-21',
     'amazon.it': 'azpricecomparisonit-21',
     'amazon.es': 'azpricecomparisones-21',
-    'amazon.nl': 'azpricecomparisonnl-21',
+    'amazon.nl': 'azpricecomparisonndl-21',
     'amazon.pl': 'azpricecomparisonpl-21',
     'amazon.se': 'azpricecomparisonse-21',
     // UK marketplace
