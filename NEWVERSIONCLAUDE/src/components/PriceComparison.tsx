@@ -122,7 +122,7 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
                   <span className="shipping-value" data-total={`${totalPrice.toFixed(2)} €`}>
                     {price.shipping === 0 ? t('common.freeShipping') : `${price.shipping?.toFixed(2)} €`}
                   </span>
-                  <span className="equals">=</span>
+                  <span className="equals">≈</span>
                   <span className="total">{totalPrice.toFixed(2)} €</span>
                 </div>
                 <div className={`difference ${priceState}`}>
