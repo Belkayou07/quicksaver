@@ -45,7 +45,7 @@ const languages = {
 
 export const Sidepanel: React.FC = () => {
     const { t } = useTranslation();
-    const { selectedMarketplaces, toggleMarketplace } = useMarketplaceStore();
+    const { selectedMarketplaces, toggleMarketplace, loadMarketplaces } = useMarketplaceStore();
     const { theme, loadTheme } = useThemeStore();
     const { language, loadLanguage } = useLanguageStore();
     const { 
@@ -58,12 +58,13 @@ export const Sidepanel: React.FC = () => {
         loadSettings
     } = useSettingsStore();
 
+    // Load all settings on mount
     useEffect(() => {
-        // Load all settings on mount
         loadSettings();
         loadTheme();
         loadLanguage();
-    }, [loadSettings, loadTheme, loadLanguage]);
+        loadMarketplaces();
+    }, [loadSettings, loadTheme, loadLanguage, loadMarketplaces]);
 
     const handleSettingChange = (setting: string, value: boolean | string) => {
         setSettings({ [setting]: value });

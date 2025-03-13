@@ -21,6 +21,38 @@ browser.runtime.onMessage.addListener(async (message: any, sender: any) => {
       return { success: true };
     }
 
+    if (message.type === 'UPDATE_SELECTED_MARKETPLACES') {
+      // Send message to all tabs to update the selected marketplaces
+      const tabs = await chrome.tabs.query({});
+      tabs.forEach(tab => {
+        if (tab.id) {
+          chrome.tabs.sendMessage(tab.id, {
+            type: 'UPDATE_SELECTED_MARKETPLACES',
+            marketplaces: message.marketplaces
+          }).catch(() => {
+            // Ignore errors for tabs that don't have the content script
+          });
+        }
+      });
+      return { success: true };
+    }
+
+    if (message.type === 'UPDATE_CURRENCY') {
+      // Send message to all tabs to update the currency display
+      const tabs = await chrome.tabs.query({});
+      tabs.forEach(tab => {
+        if (tab.id) {
+          chrome.tabs.sendMessage(tab.id, {
+            type: 'UPDATE_CURRENCY',
+            currencyCode: message.currencyCode
+          }).catch(() => {
+            // Ignore errors for tabs that don't have the content script
+          });
+        }
+      });
+      return { success: true };
+    }
+
     if (message.type === 'CLICK_EXTENSION') {
       // Get current window to position the popup
       const [currentWindow] = await chrome.windows.getAll({ windowTypes: ['normal'], populate: true });

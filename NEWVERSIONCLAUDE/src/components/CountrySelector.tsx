@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from '@emotion/styled';
-import { useStore } from '../store/marketplace';
+import { useMarketplaceStore } from '../store/marketplaceStore';
+import { MARKETPLACES, marketplaceToCountry } from '../config/marketplaces';
 
 const Container = styled.div`
   display: flex;
@@ -92,26 +93,45 @@ const Toggle = styled.label`
   }
 `;
 
-export const CountrySelector = () => {
-  const { selectedCountries, toggleCountry } = useStore();
+// Map country codes to their respective marketplace domains
+const countryToMarketplace: { [key: string]: string } = Object.entries(marketplaceToCountry).reduce(
+  (acc, [marketplace, countryCode]) => ({
+    ...acc,
+    [countryCode]: marketplace
+  }),
+  {}
+);
 
-  const countries = {
-    'North America': [
-      { code: 'US', name: 'United States' },
-      { code: 'CA', name: 'Canada' },
-    ],
-    'Europe': [
-      { code: 'GB', name: 'United Kingdom' },
-      { code: 'DE', name: 'Germany' },
-      { code: 'FR', name: 'France' },
-      { code: 'IT', name: 'Italy' },
-      { code: 'ES', name: 'Spain' },
-    ],
-  };
+export const CountrySelector = () => {
+  const { selectedMarketplaces, toggleMarketplace, loadMarketplaces, initialized } = useMarketplaceStore();
+  
+  // Load marketplaces on component mount
+  useEffect(() => {
+    loadMarketplaces();
+  }, [loadMarketplaces]);
+
+  // Group marketplace data by region for display
+  const marketplacesByRegion = Object.entries(MARKETPLACES).reduce(
+    (acc, [domain, info]) => {
+      if (!acc[info.region]) {
+        acc[info.region] = [];
+      }
+      acc[info.region].push({
+        code: marketplaceToCountry[domain],
+        name: info.name,
+        domain
+      });
+      return acc;
+    },
+    {} as Record<string, Array<{ code: string; name: string; domain: string }>>
+  );
 
   const getFlagUrl = (countryCode: string) => {
     return chrome.runtime.getURL(`assets/flags/${countryCode.toLowerCase()}.png`);
   };
+
+  // Don't render until initialized
+  if (!initialized) return null;
 
   return (
     <Container>
@@ -119,18 +139,18 @@ export const CountrySelector = () => {
         <h2>Select which countries to search</h2>
         <h3>Select your preferences</h3>
       </div>
-      {Object.entries(countries).map(([region, countryList]) => (
+      {Object.entries(marketplacesByRegion).map(([region, countries]) => (
         <CountryGroup key={region}>
           <h3>{region}</h3>
-          {countryList.map(country => (
+          {countries.map(country => (
             <CountryItem key={country.code}>
               <img src={getFlagUrl(country.code)} alt={`${country.name} flag`} />
               <span>{country.name}</span>
               <Toggle>
                 <input
                   type="checkbox"
-                  checked={selectedCountries.includes(country.code)}
-                  onChange={() => toggleCountry(country.code)}
+                  checked={selectedMarketplaces.includes(country.domain)}
+                  onChange={() => toggleMarketplace(country.domain)}
                 />
                 <span />
               </Toggle>

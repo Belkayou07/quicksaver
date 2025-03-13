@@ -5,16 +5,34 @@ import { marketplaceToCountry } from '../config/marketplaces';
 import { useThemeStore } from '../store/themeStore';
 import { useLanguageStore } from '../store/languageStore';
 import { useSettingsStore } from '../store/settingsStore';
+import { useMarketplaceStore } from '../store/marketplaceStore';
 
 interface PriceComparisonProps {
   prices: MarketplacePrice[];
 }
 
+// Exchange rates against EUR (simplified version)
+const exchangeRates: Record<string, number> = {
+  EUR: 1,
+  GBP: 0.85,
+  PLN: 4.3,
+  SEK: 11.25
+};
+
+// Currency symbols
+const currencySymbols: Record<string, string> = {
+  EUR: '€',
+  GBP: '£',
+  PLN: 'zł',
+  SEK: 'kr'
+};
+
 export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
   const { t } = useTranslation();
   const { theme, loadTheme } = useThemeStore();
   const { loadLanguage } = useLanguageStore();
-  const { priceComparisonEnabled, initialized, loadSettings } = useSettingsStore();
+  const { priceComparisonEnabled, initialized, loadSettings, currencyCode } = useSettingsStore();
+  const { selectedMarketplaces } = useMarketplaceStore();
   
   useEffect(() => {
     // Load all settings on mount
@@ -32,6 +50,19 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
   const currentMarketplace = window.location.hostname.replace('www.', '');
   const currentPrice = prices.find(p => p.marketplace === currentMarketplace);
   const basePriceEUR = currentPrice ? currentPrice.price + (currentPrice.shipping || 0) : 0;
+
+  // Convert EUR to selected currency
+  const convertPrice = (eurPrice: number): number => {
+    const rate = exchangeRates[currencyCode] || 1;
+    return eurPrice * rate;
+  };
+
+  // Format a price with the selected currency symbol
+  const formatPrice = (price: number): string => {
+    const formatted = price.toFixed(2);
+    const symbol = currencySymbols[currencyCode] || '€';
+    return `${formatted} ${symbol}`;
+  };
 
   const calculatePriceDifference = (price: number): string => {
     if (!basePriceEUR) return 'N/A';
@@ -96,13 +127,19 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
           .filter(price => 
             price.price && 
             typeof price.shipping === 'number' && 
-            price.marketplace !== currentMarketplace
+            price.marketplace !== currentMarketplace &&
+            selectedMarketplaces.includes(price.marketplace) // Filter by selected marketplaces
           )
           .map((price, index) => {
             const totalPrice = price.price + (price.shipping || 0);
             const difference = calculatePriceDifference(totalPrice);
             const priceState = getPriceState(difference);
             const countryCode = marketplaceToCountry[price.marketplace];
+
+            // Convert prices to the selected currency
+            const convertedPrice = convertPrice(price.price);
+            const convertedShipping = convertPrice(price.shipping || 0);
+            const convertedTotal = convertedPrice + convertedShipping;
 
             return (
               <a 
@@ -117,13 +154,13 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
                   <span className="country-code">{countryCode}</span>
                 </div>
                 <div className="price-details">
-                  <span className="base-price">{price.price.toFixed(2)} €</span>
+                  <span className="base-price">{formatPrice(convertedPrice)}</span>
                   <span className="shipping">+</span>
-                  <span className="shipping-value" data-total={`${totalPrice.toFixed(2)} €`}>
-                    {price.shipping === 0 ? t('common.freeShipping') : `${price.shipping?.toFixed(2)} €`}
+                  <span className="shipping-value" data-total={formatPrice(convertedTotal)}>
+                    {price.shipping === 0 ? t('common.freeShipping') : formatPrice(convertedShipping)}
                   </span>
                   <span className="equals">≈</span>
-                  <span className="total">{totalPrice.toFixed(2)} €</span>
+                  <span className="total">{formatPrice(convertedTotal)}</span>
                 </div>
                 <div className={`difference ${priceState}`}>
                   {difference}

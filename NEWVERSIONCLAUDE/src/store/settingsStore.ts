@@ -78,6 +78,22 @@ const useSettingsStore = create<SettingsState>((set) => {
                     });
                 });
             }
+
+            // If currency code changed, notify all tabs to update price display
+            if ('currencyCode' in newSettings) {
+                chrome.tabs.query({}, (tabs) => {
+                    tabs.forEach(tab => {
+                        if (tab.id) {
+                            chrome.tabs.sendMessage(tab.id, {
+                                type: 'UPDATE_CURRENCY',
+                                currencyCode: newSettings.currencyCode
+                            }).catch(() => {
+                                // Ignore errors for tabs that don't have the content script
+                            });
+                        }
+                    });
+                });
+            }
         },
 
         loadSettings: async () => {

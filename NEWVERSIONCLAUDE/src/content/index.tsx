@@ -5,6 +5,9 @@ import { PriceService } from '../services/priceService';
 import PriceComparison from '../components/PriceComparison';
 import '../styles/priceComparison.css';
 
+let comparisonRoot: ReturnType<typeof createRoot> | null = null;
+let currentPrices: any[] = [];
+
 const injectPriceComparison = async () => {
   const currentUrl = window.location.href;
   console.log('[DEBUG] Checking URL:', currentUrl);
@@ -35,34 +38,42 @@ const injectPriceComparison = async () => {
   }
 
   // Create container for our widget
-  const container = document.createElement('div');
-  container.id = 'quick-saver-price-comparison';
+  let container = document.getElementById('quick-saver-price-comparison');
   
-  // Find the best spot to inject our widget
-  const priceBlock = document.querySelector('#corePriceDisplay_desktop_feature_div') || 
-                    document.querySelector('#corePrice_desktop_feature_div') ||
-                    document.querySelector('#corePrice_feature_div') ||
-                    document.querySelector('#price') ||
-                    document.querySelector('.a-price-whole')?.closest('.a-section');
-                    
-  if (!priceBlock) {
-    console.warn('Could not find price block to inject widget');
-    return;
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'quick-saver-price-comparison';
+    
+    // Find the best spot to inject our widget
+    const priceBlock = document.querySelector('#corePriceDisplay_desktop_feature_div') || 
+                      document.querySelector('#corePrice_desktop_feature_div') ||
+                      document.querySelector('#corePrice_feature_div') ||
+                      document.querySelector('#price') ||
+                      document.querySelector('.a-price-whole')?.closest('.a-section');
+                      
+    if (!priceBlock) {
+      console.warn('Could not find price block to inject widget');
+      return;
+    }
+
+    // Insert after the price block
+    priceBlock.parentNode?.insertBefore(container, priceBlock.nextSibling);
+
+    // Create root once
+    comparisonRoot = createRoot(container);
   }
 
-  // Insert after the price block
-  priceBlock.parentNode?.insertBefore(container, priceBlock.nextSibling);
-
   // Get prices from other marketplaces
-  const prices = await PriceService.comparePrice(asin);
+  currentPrices = await PriceService.comparePrice(asin);
 
   // Render our component
-  const root = createRoot(container);
-  root.render(
-    <PriceComparison 
-      prices={prices}
-    />
-  );
+  if (comparisonRoot) {
+    comparisonRoot.render(
+      <PriceComparison 
+        prices={currentPrices}
+      />
+    );
+  }
 };
 
 // Initial injection
@@ -78,4 +89,58 @@ const observer = new MutationObserver(() => {
 observer.observe(document.body, {
   childList: true,
   subtree: true
+});
+
+// Listen for messages from the background script or popup
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  try {
+    console.log('[DEBUG] Received message:', message);
+
+    if (message.type === 'TOGGLE_PRICE_COMPARISON') {
+      // Re-render the component to reflect the new setting
+      const container = document.getElementById('quick-saver-price-comparison');
+      if (container && comparisonRoot && currentPrices.length > 0) {
+        comparisonRoot.render(
+          <PriceComparison 
+            prices={currentPrices}
+          />
+        );
+      }
+      sendResponse({ success: true });
+      return true;
+    }
+
+    if (message.type === 'UPDATE_SELECTED_MARKETPLACES') {
+      // Re-render the component with the updated marketplace selection
+      if (comparisonRoot && currentPrices.length > 0) {
+        comparisonRoot.render(
+          <PriceComparison 
+            prices={currentPrices}
+          />
+        );
+      }
+      sendResponse({ success: true });
+      return true;
+    }
+
+    if (message.type === 'UPDATE_CURRENCY') {
+      // Re-render the component with the updated currency
+      if (comparisonRoot && currentPrices.length > 0) {
+        comparisonRoot.render(
+          <PriceComparison 
+            prices={currentPrices}
+          />
+        );
+      }
+      sendResponse({ success: true });
+      return true;
+    }
+
+    sendResponse({ success: false, error: 'Unknown message type' });
+    return true;
+  } catch (error) {
+    console.error('[DEBUG] Error handling message:', error);
+    sendResponse({ success: false, error: String(error) });
+    return true;
+  }
 });
