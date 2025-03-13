@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MarketplacePrice } from '../types/marketplace';
 import { marketplaceToCountry } from '../config/marketplaces';
@@ -10,14 +10,6 @@ import { useMarketplaceStore } from '../store/marketplaceStore';
 interface PriceComparisonProps {
   prices: MarketplacePrice[];
 }
-
-// Exchange rates against EUR (simplified version)
-const exchangeRates: Record<string, number> = {
-  EUR: 1,
-  GBP: 0.85,
-  PLN: 4.3,
-  SEK: 11.25
-};
 
 // Currency symbols
 const currencySymbols: Record<string, string> = {
@@ -33,12 +25,31 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
   const { loadLanguage } = useLanguageStore();
   const { priceComparisonEnabled, initialized, loadSettings, currencyCode } = useSettingsStore();
   const { selectedMarketplaces } = useMarketplaceStore();
+  const [exchangeRates, setExchangeRates] = useState<Record<string, number>>({});
   
   useEffect(() => {
     // Load all settings on mount
     loadSettings();
     loadTheme();
     loadLanguage();
+
+    // Fetch exchange rates
+    const fetchRates = async () => {
+      try {
+        const response = await chrome.runtime.sendMessage({
+          type: 'FETCH_EXCHANGE_RATES',
+          url: 'https://api.exchangerate.fun/latest?base=EUR'
+        });
+        
+        if (response && response.rates) {
+          setExchangeRates(response.rates);
+        }
+      } catch (error) {
+        console.error('Failed to fetch exchange rates:', error);
+      }
+    };
+
+    fetchRates();
   }, [loadSettings, loadTheme, loadLanguage]);
 
   // Don't render until we've loaded the initial state
@@ -49,12 +60,19 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
 
   const currentMarketplace = window.location.hostname.replace('www.', '');
   const currentPrice = prices.find(p => p.marketplace === currentMarketplace);
-  const basePriceEUR = currentPrice ? currentPrice.price + (currentPrice.shipping || 0) : 0;
+  const basePrice = currentPrice ? currentPrice.originalPrice + (currentPrice.originalShipping || 0) : 0;
+  const baseCurrency = currentPrice ? currentPrice.originalCurrency : 'EUR';
 
-  // Convert EUR to selected currency
-  const convertPrice = (eurPrice: number): number => {
-    const rate = exchangeRates[currencyCode] || 1;
-    return eurPrice * rate;
+  // Convert price from any currency to selected currency
+  const convertPrice = (price: number, fromCurrency: string): number => {
+    if (fromCurrency === currencyCode) return price;
+    
+    const fromRate = exchangeRates[fromCurrency] || 1;
+    const toRate = exchangeRates[currencyCode] || 1;
+    
+    // Convert through EUR as base currency
+    const priceInEUR = price / fromRate;
+    return priceInEUR * toRate;
   };
 
   // Format a price with the selected currency symbol
@@ -64,9 +82,11 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
     return `${formatted} ${symbol}`;
   };
 
-  const calculatePriceDifference = (price: number): string => {
-    if (!basePriceEUR) return 'N/A';
-    const diff = ((price - basePriceEUR) / basePriceEUR) * 100;
+  const calculatePriceDifference = (price: number, currency: string): string => {
+    if (!basePrice) return 'N/A';
+    const convertedBasePrice = convertPrice(basePrice, baseCurrency);
+    const convertedPrice = convertPrice(price, currency);
+    const diff = ((convertedPrice - convertedBasePrice) / convertedBasePrice) * 100;
     if (diff === 0) return '0%';
     return diff > 0 ? `+${diff.toFixed(0)}%` : `-${Math.abs(diff).toFixed(0)}%`;
   };
@@ -125,20 +145,22 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
       <div className="price-comparison-content">
         {prices
           .filter(price => 
-            price.price && 
-            typeof price.shipping === 'number' && 
+            price.originalPrice && 
+            typeof price.originalShipping === 'number' && 
             price.marketplace !== currentMarketplace &&
             selectedMarketplaces.includes(price.marketplace) // Filter by selected marketplaces
           )
           .map((price, index) => {
-            const totalPrice = price.price + (price.shipping || 0);
-            const difference = calculatePriceDifference(totalPrice);
+            const totalPrice = price.originalPrice + (price.originalShipping || 0);
+            const difference = calculatePriceDifference(totalPrice, price.originalCurrency);
             const priceState = getPriceState(difference);
             const countryCode = marketplaceToCountry[price.marketplace];
 
             // Convert prices to the selected currency
-            const convertedPrice = convertPrice(price.price);
-            const convertedShipping = convertPrice(price.shipping || 0);
+            const convertedPrice = convertPrice(price.originalPrice, price.originalCurrency);
+            const convertedShipping = price.originalShipping !== null ? 
+              convertPrice(price.originalShipping, price.originalCurrency) : 
+              0;
             const convertedTotal = convertedPrice + convertedShipping;
 
             return (
@@ -157,7 +179,7 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
                   <span className="base-price">{formatPrice(convertedPrice)}</span>
                   <span className="shipping">+</span>
                   <span className="shipping-value" data-total={formatPrice(convertedTotal)}>
-                    {price.shipping === 0 ? t('common.freeShipping') : formatPrice(convertedShipping)}
+                    {price.originalShipping === 0 ? t('common.freeShipping') : formatPrice(convertedShipping)}
                   </span>
                   <span className="equals">≈</span>
                   <span className="total">{formatPrice(convertedTotal)}</span>

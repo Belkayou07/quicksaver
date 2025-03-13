@@ -90,9 +90,44 @@ export class PriceService {
       const parser = new DOMParser();
       const doc = parser.parseFromString(response.data, 'text/html');
 
+      // Check if we're on a "New & Used" page and redirect to the main product page
+      const isUsedPage = doc.querySelector('#olpLinkWidget, #olp-upd-new, #olp-upd-new-used');
+      if (isUsedPage) {
+        console.log(`[DEBUG] ${marketplace}: On a used/new offers page, need to get main product page`);
+        // Try to find link to main product page
+        const mainPageLink = doc.querySelector('a[href*="/dp/"]');
+        if (mainPageLink && mainPageLink.getAttribute('href')) {
+          const newUrl = new URL(mainPageLink.getAttribute('href') || '', `https://${marketplace}`).href;
+          console.log(`[DEBUG] ${marketplace}: Redirecting to main product page: ${newUrl}`);
+          
+          const newResponse = await browser.runtime.sendMessage({
+            type: 'FETCH_URL',
+            url: newUrl
+          });
+          
+          if (!newResponse.success) {
+            throw new Error(newResponse.error);
+          }
+          
+          doc.documentElement.innerHTML = newResponse.data;
+        }
+      }
+
+      // Check for "Buy New" section to ensure we're looking at new products
+      const buyNewSection = doc.querySelector('#newAccordionRow, #newOfferAccordionRow, #buyNew, #buybox');
+      if (buyNewSection) {
+        console.log(`[DEBUG] ${marketplace}: Found Buy New section`);
+      }
+
       // Price selectors in order of preference, prioritizing deal prices
       const priceSelectors = [
-        // Deal and discount prices first
+        // New product selectors first
+        '#newBuyBoxPrice',
+        '#price_inside_buybox',
+        '#corePrice_desktop .a-price .a-offscreen',
+        '#corePrice_feature_div .a-price .a-offscreen',
+        '#corePriceDisplay_desktop_feature_div .a-price .a-offscreen',
+        // Deal and discount prices
         '#priceblock_dealprice',
         '#priceblock_saleprice',
         '.apexPriceToPay .a-offscreen',
@@ -103,94 +138,155 @@ export class PriceService {
         // Regular prices
         '.a-price .a-offscreen',
         '#priceblock_ourprice',
-        '#price_inside_buybox',
-        '#newBuyBoxPrice',
         '#corePrice_feature_div .a-price-whole',
         '.price-info-supersize .a-price .a-offscreen',
         '#price .a-price .a-offscreen',
         '#apex_desktop_newAccordionRow .a-price .a-offscreen',
-        '.a-price-whole',
-        '#corePrice_desktop .a-price .a-offscreen',
-        '#corePrice_feature_div .a-price .a-offscreen',
-        '#corePriceDisplay_desktop_feature_div .a-price .a-offscreen'
+        '.a-price-whole'
       ];
 
       let priceElement = null;
       let matchedSelector = '';
       let priceText = '';
 
-      // First try to find any explicit deal or discount price
-      const dealPriceContainers = [
-        '#corePriceDisplay_desktop_feature_div',
+      // First check if there's a "New" price specifically
+      const newPriceContainers = [
+        '#newBuyBox',
+        '#newAccordionRow',
+        '#buyNew',
+        '#buybox',
+        '#corePrice_desktop',
         '#corePrice_feature_div',
-        '#price',
-        '#desktop_buybox',
-        '#centerCol'
+        '#corePriceDisplay_desktop_feature_div'
       ];
 
-      // Look for discount patterns first
-      for (const container of dealPriceContainers) {
+      // Look for new product prices first
+      for (const container of newPriceContainers) {
         const element = doc.querySelector(container);
         if (element) {
-          console.log(`[DEBUG] ${marketplace}: Checking container ${container}`);
-          const elementText = element.textContent || '';
-          console.log(`[DEBUG] ${marketplace}: Container text: ${elementText.substring(0, 200)}...`);
+          console.log(`[DEBUG] ${marketplace}: Checking new price container ${container}`);
           
-          // First try to find the new price element directly
-          const newPriceElement = element.querySelector('.priceToPay .a-offscreen, .apexPriceToPay .a-offscreen');
-          if (newPriceElement) {
-            const text = newPriceElement.textContent?.trim();
-            if (text) {
-              priceElement = newPriceElement;
-              matchedSelector = 'direct-new-price';
-              priceText = text;
-              console.log(`[DEBUG] ${marketplace}: Found direct new price: ${text}`);
-              break;
+          // Check for "Used" or "Renewed" text to avoid these sections
+          const elementText = element.textContent?.toLowerCase() || '';
+          if (elementText.includes('used') || 
+              elementText.includes('renewed') || 
+              elementText.includes('refurbished') ||
+              elementText.includes('gebruikt') ||  // Dutch
+              elementText.includes('occasion') ||  // French
+              elementText.includes('gebraucht') || // German
+              elementText.includes('usato') ||     // Italian
+              elementText.includes('usado')) {     // Spanish/Portuguese
+            console.log(`[DEBUG] ${marketplace}: Skipping container with used/renewed products`);
+            continue;
+          }
+          
+          // Try to find the price element within this container
+          for (const selector of priceSelectors) {
+            const priceEl = element.querySelector(selector);
+            if (priceEl) {
+              const text = priceEl.textContent?.trim();
+              if (text) {
+                priceElement = priceEl;
+                matchedSelector = `${container} > ${selector}`;
+                priceText = text;
+                console.log(`[DEBUG] ${marketplace}: Found new product price: ${text}`);
+                break;
+              }
             }
           }
+          
+          if (priceText) break;
+        }
+      }
 
-          // Check for percentage discount
-          const discountMatch = elementText.match(/[-−]?\s*(\d+)\s*%/);
-          if (discountMatch) {
-            console.log(`[DEBUG] ${marketplace}: Found discount percentage: ${discountMatch[1]}%`);
+      // If no new price found, try the deal price containers
+      if (!priceText) {
+        const dealPriceContainers = [
+          '#corePriceDisplay_desktop_feature_div',
+          '#corePrice_feature_div',
+          '#price',
+          '#desktop_buybox',
+          '#centerCol'
+        ];
+
+        // Look for discount patterns
+        for (const container of dealPriceContainers) {
+          const element = doc.querySelector(container);
+          if (element) {
+            console.log(`[DEBUG] ${marketplace}: Checking container ${container}`);
+            const elementText = element.textContent || '';
             
-            // Look for prices near the discount
-            const priceElements = element.querySelectorAll('.a-price .a-offscreen');
-            console.log(`[DEBUG] ${marketplace}: Found ${priceElements.length} price elements`);
+            // Skip if this appears to be a used/renewed section
+            if (elementText.toLowerCase().includes('used') || 
+                elementText.toLowerCase().includes('renewed') ||
+                elementText.toLowerCase().includes('refurbished') ||
+                elementText.toLowerCase().includes('gebruikt') ||
+                elementText.toLowerCase().includes('occasion') ||
+                elementText.toLowerCase().includes('gebraucht') ||
+                elementText.toLowerCase().includes('usato') ||
+                elementText.toLowerCase().includes('usado')) {
+              console.log(`[DEBUG] ${marketplace}: Skipping used/renewed section`);
+              continue;
+            }
             
-            let prices: { element: Element; text: string; }[] = [];
-            priceElements.forEach(el => {
-              const text = el.textContent?.trim();
+            console.log(`[DEBUG] ${marketplace}: Container text: ${elementText.substring(0, 200)}...`);
+            
+            // First try to find the new price element directly
+            const newPriceElement = element.querySelector('.priceToPay .a-offscreen, .apexPriceToPay .a-offscreen');
+            if (newPriceElement) {
+              const text = newPriceElement.textContent?.trim();
               if (text) {
-                prices.push({ element: el, text });
-                console.log(`[DEBUG] ${marketplace}: Price candidate: ${text}`);
-              }
-            });
-
-            // Sort prices numerically
-            prices.sort((a, b) => {
-              const aNum = parseFloat(a.text.replace(/[^0-9.,]/g, '').replace(',', '.'));
-              const bNum = parseFloat(b.text.replace(/[^0-9.,]/g, '').replace(',', '.'));
-              return aNum - bNum;
-            });
-
-            // The lowest price is likely the discounted price
-            if (prices.length > 0) {
-              const lowestPrice = prices[0];
-              const isStrikethrough = lowestPrice.element.closest('.a-text-strike, .a-text-price-strike, [data-a-strike="true"]');
-              if (!isStrikethrough) {
-                priceElement = lowestPrice.element;
-                matchedSelector = 'lowest-price-near-discount';
-                priceText = lowestPrice.text;
-                console.log(`[DEBUG] ${marketplace}: Selected lowest price: ${priceText}`);
+                priceElement = newPriceElement;
+                matchedSelector = 'direct-new-price';
+                priceText = text;
+                console.log(`[DEBUG] ${marketplace}: Found direct new price: ${text}`);
                 break;
+              }
+            }
+
+            // Check for percentage discount
+            const discountMatch = elementText.match(/[-−]?\s*(\d+)\s*%/);
+            if (discountMatch) {
+              console.log(`[DEBUG] ${marketplace}: Found discount percentage: ${discountMatch[1]}%`);
+              
+              // Look for prices near the discount
+              const priceElements = element.querySelectorAll('.a-price .a-offscreen');
+              console.log(`[DEBUG] ${marketplace}: Found ${priceElements.length} price elements`);
+              
+              let prices: { element: Element; text: string; }[] = [];
+              priceElements.forEach(el => {
+                const text = el.textContent?.trim();
+                if (text) {
+                  prices.push({ element: el, text });
+                  console.log(`[DEBUG] ${marketplace}: Price candidate: ${text}`);
+                }
+              });
+
+              // Sort prices numerically
+              prices.sort((a, b) => {
+                const aNum = parseFloat(a.text.replace(/[^0-9.,]/g, '').replace(',', '.'));
+                const bNum = parseFloat(b.text.replace(/[^0-9.,]/g, '').replace(',', '.'));
+                return aNum - bNum;
+              });
+
+              // The lowest price is likely the discounted price
+              if (prices.length > 0) {
+                const lowestPrice = prices[0];
+                const isStrikethrough = lowestPrice.element.closest('.a-text-strike, .a-text-price-strike, [data-a-strike="true"]');
+                if (!isStrikethrough) {
+                  priceElement = lowestPrice.element;
+                  matchedSelector = 'lowest-price-near-discount';
+                  priceText = lowestPrice.text;
+                  console.log(`[DEBUG] ${marketplace}: Selected lowest price: ${priceText}`);
+                  break;
+                }
               }
             }
           }
         }
       }
 
-      // If no discount price found, try regular selectors
+      // If still no price found, try regular selectors
       if (!priceText) {
         console.log(`[DEBUG] ${marketplace}: No discount price found, trying regular selectors`);
         for (const selector of priceSelectors) {
@@ -201,6 +297,20 @@ export class PriceService {
               // Skip if it's marked as "was" price or crossed out
               const isStrikethrough = element.closest('.a-text-strike, .a-text-price-strike, [data-a-strike="true"]');
               if (!isStrikethrough) {
+                // Check if this price is in a used/renewed section
+                const parentText = element.closest('#usedAccordionRow, #renewedAccordionRow, #usedBuyBox, #renewedBuyBox')?.textContent?.toLowerCase() || '';
+                if (parentText.includes('used') || 
+                    parentText.includes('renewed') || 
+                    parentText.includes('refurbished') ||
+                    parentText.includes('gebruikt') ||
+                    parentText.includes('occasion') ||
+                    parentText.includes('gebraucht') ||
+                    parentText.includes('usato') ||
+                    parentText.includes('usado')) {
+                  console.log(`[DEBUG] ${marketplace}: Skipping price in used/renewed section: ${text}`);
+                  continue;
+                }
+                
                 priceElement = element;
                 matchedSelector = selector;
                 priceText = text;
@@ -209,27 +319,6 @@ export class PriceService {
             }
           }
           if (priceText) break;
-        }
-      }
-
-      // If still no price found, try pattern matching as last resort
-      if (!priceText) {
-        const pricePattern = /(?:EUR|€|£|\$|USD|PLN|SEK)\s*\d+([.,]\d{2})?|\d+([.,]\d{2})?\s*(?:EUR|€|£|\$|USD|PLN|SEK)/;
-        
-        for (const container of dealPriceContainers) {
-          const element = doc.querySelector(container);
-          if (element) {
-            const text = element.textContent || '';
-            // Exclude text that looks like a crossed-out or "was" price
-            if (!text.includes('Prix conseillé') && !text.includes('Was') && !text.includes('Previous')) {
-              const match = text.match(pricePattern);
-              if (match) {
-                priceText = match[0];
-                matchedSelector = 'price-pattern-match';
-                break;
-              }
-            }
-          }
         }
       }
 
@@ -349,7 +438,10 @@ export class PriceService {
         shipping,
         currency,
         available,
-        affiliateLink
+        affiliateLink,
+        originalPrice: price,
+        originalShipping: shipping,
+        originalCurrency: currency
       };
 
       console.log(`[DEBUG] ${marketplace} final result:`, result);
@@ -437,7 +529,7 @@ export class PriceService {
       }
     });
     
-    // Get the current marketplace price first and convert it to EUR
+    // Get the current marketplace price first
     const currentMarketplace = window.location.hostname.replace('www.', '');
     console.log(`[DEBUG] Current marketplace: ${currentMarketplace}`);
     
@@ -454,10 +546,9 @@ export class PriceService {
     }
 
     const currentItem = currentMarketplaceResult.value;
-    const currentPriceEUR = this.convertToEUR(currentItem.price, currentItem.currency);
-    console.log(`[DEBUG] Current marketplace price in EUR: ${currentPriceEUR}`);
+    console.log(`[DEBUG] Current marketplace price: ${currentItem.price} ${currentItem.currency}`);
     
-    // Filter out failed requests and null results, convert prices to EUR
+    // Filter out failed requests and null results, keep original prices
     const filteredResults = results
       .filter((result): result is PromiseFulfilledResult<MarketplacePrice> => {
         const isValid = result.status === 'fulfilled' && result.value !== null;
@@ -468,27 +559,23 @@ export class PriceService {
       })
       .map(result => {
         const item = result.value;
-        const priceEUR = this.convertToEUR(item.price, item.currency);
-        const shippingEUR = item.shipping !== null ? 
-          this.convertToEUR(item.shipping, item.currency) : 
-          null;
-
-        console.log(`[DEBUG] Converted prices for ${item.marketplace}:`, {
-          originalPrice: item.price,
-          priceEUR,
-          originalShipping: item.shipping,
-          shippingEUR
+        console.log(`[DEBUG] Original prices for ${item.marketplace}:`, {
+          price: item.price,
+          currency: item.currency,
+          shipping: item.shipping
         });
 
         return {
           ...item,
-          price: priceEUR,
-          shipping: shippingEUR
+          originalPrice: item.price,
+          originalCurrency: item.currency,
+          originalShipping: item.shipping
         };
       })
       .sort((a, b) => {
-        const totalA = a.price + (a.shipping || 0);
-        const totalB = b.price + (b.shipping || 0);
+        // Sort based on original prices in their respective currencies
+        const totalA = a.originalPrice + (a.originalShipping || 0);
+        const totalB = b.originalPrice + (b.originalShipping || 0);
         return totalA - totalB;
       });
 

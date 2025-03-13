@@ -5,6 +5,9 @@ export interface MarketplacePrice {
   currency: string;
   available: boolean;
   affiliateLink: string;
+  originalPrice: number;
+  originalShipping: number | null;
+  originalCurrency: string;
 }
 
 export interface AmazonMarketplace {
