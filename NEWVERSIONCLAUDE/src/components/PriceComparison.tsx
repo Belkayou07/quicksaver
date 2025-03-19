@@ -23,7 +23,15 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
   const { t } = useTranslation();
   const { theme, loadTheme } = useThemeStore();
   const { loadLanguage } = useLanguageStore();
-  const { priceComparisonEnabled, initialized, loadSettings, currencyCode } = useSettingsStore();
+  const { 
+    priceComparisonEnabled, 
+    shippingCalculationEnabled,
+    flagDisplayEnabled,
+    priceIndicatorEnabled,
+    initialized, 
+    loadSettings, 
+    currencyCode 
+  } = useSettingsStore();
   const { selectedMarketplaces } = useMarketplaceStore();
   const [exchangeRates, setExchangeRates] = useState<Record<string, number>>({});
   
@@ -143,53 +151,93 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
         </div>
       </div>
       <div className="price-comparison-content">
-        {prices
-          .filter(price => 
-            price.originalPrice && 
-            typeof price.originalShipping === 'number' && 
-            price.marketplace !== currentMarketplace &&
-            selectedMarketplaces.includes(price.marketplace) // Filter by selected marketplaces
-          )
-          .map((price, index) => {
-            const totalPrice = price.originalPrice + (price.originalShipping || 0);
-            const difference = calculatePriceDifference(totalPrice, price.originalCurrency);
-            const priceState = getPriceState(difference);
-            const countryCode = marketplaceToCountry[price.marketplace];
+        {/* Add column headers */}
+        <div className="price-column-headers">
+          <div className="column-header-marketplace">
+            {t('priceComparison.headers.marketplace')}
+          </div>
+          <div className="column-header-price-details">
+            <span className="column-header-base-price">
+              {t('priceComparison.headers.price')}
+            </span>
+            {shippingCalculationEnabled && (
+              <>
+                <span className="column-header-shipping">+</span>
+                <span className="column-header-shipping-value">
+                  {t('priceComparison.headers.shipping')}
+                </span>
+                <span className="column-header-equals">=</span>
+                <span className="column-header-total">
+                  {t('priceComparison.headers.total')}
+                </span>
+              </>
+            )}
+          </div>
+          {priceIndicatorEnabled && (
+            <div className="column-header-difference">
+              {t('priceComparison.headers.diff')}
+            </div>
+          )}
+        </div>
+        <div className="price-list">
+          {prices
+            .filter(price => 
+              price.originalPrice && 
+              typeof price.originalShipping === 'number' && 
+              price.marketplace !== currentMarketplace &&
+              selectedMarketplaces.includes(price.marketplace) // Filter by selected marketplaces
+            )
+            .map((price, index) => {
+              const totalPrice = price.originalPrice + (price.originalShipping || 0);
+              const difference = calculatePriceDifference(totalPrice, price.originalCurrency);
+              const priceState = getPriceState(difference);
+              const countryCode = marketplaceToCountry[price.marketplace];
 
-            // Convert prices to the selected currency
-            const convertedPrice = convertPrice(price.originalPrice, price.originalCurrency);
-            const convertedShipping = price.originalShipping !== null ? 
-              convertPrice(price.originalShipping, price.originalCurrency) : 
-              0;
-            const convertedTotal = convertedPrice + convertedShipping;
+              // Convert prices to the selected currency
+              const convertedPrice = convertPrice(price.originalPrice, price.originalCurrency);
+              const convertedShipping = price.originalShipping !== null ? 
+                convertPrice(price.originalShipping, price.originalCurrency) : 
+                0;
+              const convertedTotal = convertedPrice + convertedShipping;
 
-            return (
-              <a 
-                key={index} 
-                href={price.affiliateLink}
-                className={`price-item ${priceState}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <div className="marketplace">
-                  <img src={getFlagUrl(countryCode)} alt={countryCode} className="flag" />
-                  <span className="country-code">{countryCode}</span>
-                </div>
-                <div className="price-details">
-                  <span className="base-price">{formatPrice(convertedPrice)}</span>
-                  <span className="shipping">+</span>
-                  <span className="shipping-value" data-total={formatPrice(convertedTotal)}>
-                    {price.originalShipping === 0 ? t('common.freeShipping') : formatPrice(convertedShipping)}
-                  </span>
-                  <span className="equals">≈</span>
-                  <span className="total">{formatPrice(convertedTotal)}</span>
-                </div>
-                <div className={`difference ${priceState}`}>
-                  {difference}
-                </div>
-              </a>
-            );
-          })}
+              return (
+                <a 
+                  key={index} 
+                  href={price.affiliateLink}
+                  className={`price-item ${priceState}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <div className="marketplace">
+                    {flagDisplayEnabled && (
+                      <img src={getFlagUrl(countryCode)} alt={countryCode} className="flag" />
+                    )}
+                    <span className="country-code">{countryCode}</span>
+                  </div>
+                  <div className="price-details">
+                    {shippingCalculationEnabled ? (
+                      <>
+                        <span className="base-price">{formatPrice(convertedPrice)}</span>
+                        <span className="shipping">+</span>
+                        <span className="shipping-value" data-total={formatPrice(convertedTotal)}>
+                          {price.originalShipping === 0 ? t('common.freeShipping') : formatPrice(convertedShipping)}
+                        </span>
+                        <span className="equals">≈</span>
+                        <span className="total">{formatPrice(convertedTotal)}</span>
+                      </>
+                    ) : (
+                      <span className="base-price">{formatPrice(convertedPrice)}</span>
+                    )}
+                  </div>
+                  {priceIndicatorEnabled && (
+                    <div className={`difference ${priceState}`}>
+                      {difference}
+                    </div>
+                  )}
+                </a>
+              );
+            })}
+        </div>
       </div>
       <div className="footer-note">
         {t('priceComparison.footerNote')}

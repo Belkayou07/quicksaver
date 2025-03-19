@@ -1,0 +1,10 @@
+This directory should contain the following image assets:
+
+1. logo.png - The Quick-Saver logo
+2. favicon.ico - Website favicon
+3. hero-screenshot.png - Screenshot of the extension in action
+4. chrome.png - Chrome browser logo
+5. firefox.png - Firefox browser logo
+6. edge.png - Edge browser logo
+
+Please add these assets before deploying the website.

@@ -136,6 +136,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       return true;
     }
 
+    if (message.type === 'UPDATE_DISPLAY_SETTINGS') {
+      // Re-render the component with the updated display settings
+      if (comparisonRoot && currentPrices.length > 0) {
+        comparisonRoot.render(
+          <PriceComparison 
+            prices={currentPrices}
+          />
+        );
+      }
+      sendResponse({ success: true });
+      return true;
+    }
+
     sendResponse({ success: false, error: 'Unknown message type' });
     return true;
   } catch (error) {

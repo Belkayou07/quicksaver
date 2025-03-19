@@ -35,7 +35,15 @@
         "footerNote": "Les prix incluent la conversion de devise et les frais de port",
         "shipping": "Frais de port",
         "total": "Total",
-        "difference": "Différence"
+        "difference": "Différence",
+        "noAlternatives": "Aucun prix alternatif trouvé",
+        "headers": {
+            "marketplace": "Pays",
+            "price": "Prix",
+            "shipping": "Livr",
+            "total": "Total",
+            "diff": "Diff"
+        }
     },
     "common": {
         "freeShipping": "Gratuit",

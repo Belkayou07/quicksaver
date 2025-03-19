@@ -37,7 +37,14 @@
     "difference": "Skillnad",
     "cheapestOption": "Billigaste alternativet",
     "currentPrice": "Nuvarande pris",
-    "noAlternatives": "Inga alternativa priser hittades"
+    "noAlternatives": "Inga alternativa priser hittades",
+    "headers": {
+      "marketplace": "Land",
+      "price": "Pris",
+      "shipping": "Frakt",
+      "total": "Totalt",
+      "diff": "Skillnad"
+    }
   },
   "common": {
     "freeShipping": "Gratis",

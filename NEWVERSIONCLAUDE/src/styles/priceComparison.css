@@ -93,6 +93,90 @@
   width: 100%;
 }
 
+/* Add column headers */
+.price-column-headers {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px 4px 12px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  margin-bottom: 8px;
+  height: 20px;
+}
+
+.light .price-column-headers {
+  color: rgba(0, 0, 0, 0.7);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.column-header-marketplace {
+  width: 80px;
+  flex-shrink: 0;
+  text-align: left;
+  font-weight: 600;
+}
+
+.column-header-price-details {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  margin: 0 16px;
+  gap: 8px;
+}
+
+.column-header-base-price {
+  text-align: right;
+  min-width: 50px;
+  flex: 1;
+  padding-right: 4px;
+}
+
+.column-header-shipping {
+  text-align: center;
+  width: 20px;
+  flex: 0 0 auto;
+  margin: 0 4px;
+  opacity: 0.7;
+}
+
+.column-header-shipping-value {
+  text-align: right;
+  min-width: 50px;
+  flex: 1;
+  padding-right: 4px;
+}
+
+.column-header-equals {
+  text-align: center;
+  width: 20px;
+  flex: 0 0 auto;
+  margin: 0 4px;
+  opacity: 0.7;
+}
+
+.column-header-total {
+  text-align: right;
+  min-width: 50px;
+  flex: 1;
+}
+
+.column-header-difference {
+  width: 60px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.price-comparison-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
 .price-item {
   display: flex;
   align-items: center;
@@ -104,6 +188,8 @@
   position: relative;
   border-left: 4px solid transparent;
   background-color: #2a2a2a;
+  min-height: 48px;
+  box-sizing: border-box;
 }
 
 .light .price-item {
@@ -226,9 +312,11 @@
 .price-details .shipping,
 .price-details .equals {
   text-align: center;
-  width: 10px;
+  width: 20px;
   opacity: 0.7;
   flex: 0 0 auto;
+  margin: 0 4px;
+  font-size: 14px;
 }
 
 .base-price {
@@ -236,6 +324,7 @@
   font-size: 14px;
   color: #ffffff;
   white-space: nowrap;
+  margin-right: 4px;
 }
 
 .shipping {
@@ -248,11 +337,13 @@
   color: #8b8f96;
   font-size: 14px;
   white-space: nowrap;
+  margin-right: 4px;
 }
 
 .equals {
   color: #8b8f96;
   font-size: 14px;
+  margin-right: 4px;
 }
 
 .total {
@@ -271,6 +362,11 @@
   width: 60px;
   text-align: center;
   flex-shrink: 0;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 .difference.lower {
@@ -402,4 +498,97 @@
     width: 100%;
     text-align: right;
   }
+}
+
+/* Adjustments for when flags are hidden */
+.marketplace:not(:has(.flag)) {
+  min-width: 40px;
+}
+
+/* Adjustments for when shipping calculation is disabled */
+.price-details:not(:has(.shipping)) .base-price {
+  font-weight: 700;
+  text-align: center;
+  width: 100%;
+}
+
+.price-details:not(:has(.shipping)) {
+  justify-content: center;
+}
+
+/* Adjustments for when price indicator is hidden */
+.price-item:not(:has(.difference)) {
+  padding-right: 16px;
+}
+
+.price-item:not(:has(.difference)) .price-details {
+  justify-content: flex-end;
+}
+
+/* Make sure the column headers stay aligned with the price items */
+.price-column-headers {
+  padding-left: 16px; /* Matches the left padding of price items + border */
+  padding-right: 12px; /* Matches the right padding of price items */
+}
+
+/* Responsive adjustments for column headers */
+@media (max-width: 480px) {
+  .column-header-marketplace {
+    width: 50px;
+    margin-right: 8px;
+  }
+  
+  .column-header-price-details {
+    gap: 4px;
+  }
+  
+  .column-header-shipping,
+  .column-header-equals {
+    width: 15px;
+  }
+  
+  .column-header-difference {
+    width: 60px; /* Keep fixed width to match price items at this breakpoint */
+    text-align: center;
+  }
+  
+  /* Ensure padding matches price items at this breakpoint */
+  .price-column-headers {
+    padding-left: 16px;
+    padding-right: 12px;
+  }
+}
+
+@media (max-width: 379px) {
+  .price-column-headers {
+    display: none; /* Hide headers on very small screens */
+  }
+}
+
+/* Sync with settings - hide column headers when components are hidden */
+.price-column-headers:not(:has(+ .price-list .price-item .shipping)) .column-header-shipping,
+.price-column-headers:not(:has(+ .price-list .price-item .shipping-value)) .column-header-shipping-value,
+.price-column-headers:not(:has(+ .price-list .price-item .equals)) .column-header-equals,
+.price-column-headers:not(:has(+ .price-list .price-item .total)) .column-header-total,
+.price-column-headers:not(:has(+ .price-list .price-item .difference)) .column-header-difference {
+  display: none;
+}
+
+/* Adjust when shipping calculation is disabled */
+.price-column-headers:not(:has(+ .price-list .price-item .shipping)) .column-header-price-details {
+  justify-content: center;
+}
+
+.price-column-headers:not(:has(+ .price-list .price-item .shipping)) .column-header-base-price {
+  text-align: center;
+  width: 100%;
+}
+
+/* Adjustments for when price indicator is hidden */
+.price-column-headers:not(:has(+ .price-list .price-item .difference)) {
+  padding-right: 16px;
+}
+
+.price-column-headers:not(:has(+ .price-list .price-item .difference)) .column-header-price-details {
+  justify-content: flex-end;
 }

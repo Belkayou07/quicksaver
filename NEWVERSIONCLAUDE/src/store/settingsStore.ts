@@ -79,6 +79,34 @@ const useSettingsStore = create<SettingsState>((set) => {
                 });
             }
 
+            // If display settings changed, notify all tabs to update display
+            if ('shippingCalculationEnabled' in newSettings || 
+                'flagDisplayEnabled' in newSettings || 
+                'priceIndicatorEnabled' in newSettings) {
+                chrome.tabs.query({}, (tabs) => {
+                    tabs.forEach(tab => {
+                        if (tab.id) {
+                            chrome.tabs.sendMessage(tab.id, {
+                                type: 'UPDATE_DISPLAY_SETTINGS',
+                                settings: {
+                                    shippingCalculationEnabled: 'shippingCalculationEnabled' in newSettings 
+                                        ? newSettings.shippingCalculationEnabled 
+                                        : undefined,
+                                    flagDisplayEnabled: 'flagDisplayEnabled' in newSettings 
+                                        ? newSettings.flagDisplayEnabled 
+                                        : undefined,
+                                    priceIndicatorEnabled: 'priceIndicatorEnabled' in newSettings 
+                                        ? newSettings.priceIndicatorEnabled 
+                                        : undefined
+                                }
+                            }).catch(() => {
+                                // Ignore errors for tabs that don't have the content script
+                            });
+                        }
+                    });
+                });
+            }
+
             // If currency code changed, notify all tabs to update price display
             if ('currencyCode' in newSettings) {
                 chrome.tabs.query({}, (tabs) => {

@@ -37,7 +37,14 @@
     "difference": "Różnica",
     "cheapestOption": "Najtańsza opcja",
     "currentPrice": "Obecna cena",
-    "noAlternatives": "Nie znaleziono alternatywnych cen"
+    "noAlternatives": "Nie znaleziono alternatywnych cen",
+    "headers": {
+      "marketplace": "Kraj",
+      "price": "Cena",
+      "shipping": "Przesyłka",
+      "total": "Razem",
+      "diff": "Różnica"
+    }
   },
   "common": {
     "freeShipping": "Darmowa",

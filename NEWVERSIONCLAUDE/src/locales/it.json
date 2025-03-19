@@ -38,7 +38,14 @@
         "difference": "Differenza",
         "cheapestOption": "Opzione più economica",
         "currentPrice": "Prezzo attuale",
-        "noAlternatives": "Nessun prezzo alternativo trovato"
+        "noAlternatives": "Nessun prezzo alternativo trovato",
+        "headers": {
+            "marketplace": "Paese",
+            "price": "Prezzo",
+            "shipping": "Sped",
+            "total": "Totale",
+            "diff": "Diff"
+        }
     },
     "common": {
         "freeShipping": "Gratuito",

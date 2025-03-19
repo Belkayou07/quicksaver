@@ -38,7 +38,14 @@
         "difference": "Verschil",
         "cheapestOption": "Goedkoopste optie",
         "currentPrice": "Huidige prijs",
-        "noAlternatives": "Geen alternatieve prijzen gevonden"
+        "noAlternatives": "Geen alternatieve prijzen gevonden",
+        "headers": {
+            "marketplace": "Land",
+            "price": "Prijs",
+            "shipping": "Verz",
+            "total": "Totaal",
+            "diff": "Versch"
+        }
     },
     "common": {
         "freeShipping": "Gratis",
