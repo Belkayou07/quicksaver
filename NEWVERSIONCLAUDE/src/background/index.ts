@@ -1,5 +1,7 @@
 // Background script for the extension
 import { browser } from 'webextension-polyfill-ts';
+import { enhancedFetch, simpleFetch } from '../utils/fetchUtils';
+import { Logger } from '../utils/logger';
 
 // Listen for installation
 browser.runtime.onInstalled.addListener(async () => {
@@ -159,22 +161,57 @@ browser.runtime.onMessage.addListener(async (message: any, sender: any) => {
     }
 
     if (message.type === 'FETCH_URL') {
-      const response = await fetch(message.url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      try {
+        const response = await enhancedFetch(message.url);
+        
+        if (!response) {
+          return { 
+            success: false, 
+            error: 'Failed to fetch URL after multiple attempts', 
+            status: 0 
+          };
+        }
+        
+        if (!response.ok) {
+          return { 
+            success: false, 
+            error: `HTTP error! status: ${response.status}`, 
+            status: response.status 
+          };
+        }
+        
+        const data = await response.text();
+        return { success: true, data, status: response.status };
+      } catch (error) {
+        Logger.api.error('Error fetching URL', { url: message.url, error });
+        return { 
+          success: false, 
+          error: error instanceof Error ? error.message : 'An unknown error occurred',
+          status: 0
+        };
       }
-      return { success: true, data: await response.text() };
     }
 
     if (message.type === 'FETCH_EXCHANGE_RATES') {
       try {
-        const response = await fetch(message.url);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        // Use simpleFetch for exchange rate APIs to avoid CORS issues
+        const response = await simpleFetch(message.url);
+        
+        if (!response) {
+          return { 
+            success: false, 
+            error: 'Failed to fetch exchange rates' 
+          };
         }
-        return await response.json();
+        
+        const data = await response.json();
+        return data;
       } catch (error) {
-        throw console.error('Error in background script:', error);
+        Logger.api.error('Error fetching exchange rates', { url: message.url, error });
+        return { 
+          success: false, 
+          error: error instanceof Error ? error.message : 'An unknown error occurred' 
+        };
       }
     }
 

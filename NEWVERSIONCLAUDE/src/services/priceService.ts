@@ -3,6 +3,7 @@ import { MarketplacePrice } from '../types/marketplace';
 import { browser } from 'webextension-polyfill-ts';
 import { MARKETPLACES } from '../config/marketplaces';
 import { Logger } from '../utils/logger';
+import { asyncPool } from '../utils/fetchUtils';
 
 export class PriceService {
   private static EXCHANGE_API_BASE = 'https://api.exchangerate.fun/latest';
@@ -17,49 +18,118 @@ export class PriceService {
   /**
    * Updates exchange rates from the API
    */
-  private static async updateExchangeRates(retryCount = 3): Promise<void> {
+  private static async updateExchangeRates(retryCount = 2): Promise<void> {
     const now = Date.now();
     if (now - this.lastUpdate < this.UPDATE_INTERVAL && Object.keys(this.exchangeRates).length > 0) {
+      Logger.api.debug('Using cached exchange rates');
       return;
     }
 
-    for (let attempt = 1; attempt <= retryCount; attempt++) {
+    Logger.api.info('Updating exchange rates');
+    
+    // Try multiple API endpoints in case one is down - all of these are free, public APIs with good CORS support
+    const apiEndpoints = [
+      'https://open.er-api.com/v6/latest/EUR',        // Open Exchange Rates API
+      'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur.json', // GitHub hosted free currency API
+      'https://cdn.moneyconvert.net/api/latest.json'   // MoneyConvert API
+    ];
+    
+    const currencies = Object.values(this.MARKETPLACES).map(m => m.currency);
+    const uniqueCurrenciesArr = [...new Set(currencies)];
+    
+    // Try each API endpoint
+    let success = false;
+    for (const apiEndpoint of apiEndpoints) {
+      if (success) break;
+      
+      Logger.api.debug(`Trying exchange rate API: ${apiEndpoint}`);
+      
       try {
-        const currencies = Object.values(this.MARKETPLACES).map(m => m.currency);
-        const uniqueCurrencies = [...new Set(currencies)].join(',');
-        
-        // Use a CORS proxy or handle the error gracefully
         const response = await browser.runtime.sendMessage({
           type: 'FETCH_EXCHANGE_RATES',
-          url: `https://api.exchangerate.host/latest?base=EUR&symbols=${uniqueCurrencies}`
+          url: apiEndpoint
         });
 
-        if (!response || !response.rates) {
-          Logger.api.warn('Invalid exchange rate response format');
-          return;
+        // Handle different API response formats
+        if (apiEndpoint.includes('open.er-api.com')) {
+          if (response && response.rates) {
+            this.exchangeRates = response.rates;
+            success = true;
+          }
+        } else if (apiEndpoint.includes('fawazahmed0/currency-api')) {
+          if (response && response.eur) {
+            // Convert to our expected format
+            const rates: Record<string, number> = {};
+            rates['EUR'] = 1;
+            
+            for (const currency of uniqueCurrenciesArr) {
+              if (currency !== 'EUR' && response.eur[currency.toLowerCase()]) {
+                rates[currency] = response.eur[currency.toLowerCase()];
+              }
+            }
+            
+            this.exchangeRates = rates;
+            success = true;
+          }
+        } else if (apiEndpoint.includes('moneyconvert.net')) {
+          if (response && response.rates) {
+            // Convert to our expected format
+            const rates: Record<string, number> = {};
+            rates['EUR'] = 1;
+            
+            for (const currency of uniqueCurrenciesArr) {
+              if (currency !== 'EUR' && response.rates[`EUR${currency}`]) {
+                rates[currency] = response.rates[`EUR${currency}`];
+              }
+            }
+            
+            this.exchangeRates = rates;
+            success = true;
+          }
         }
-
-        this.exchangeRates = response.rates;
-        this.lastUpdate = now;
-        Logger.api.info('Exchange rates updated successfully');
-        return;
+        
+        if (success) {
+          this.lastUpdate = now;
+          Logger.api.info('Exchange rates updated successfully', { 
+            source: apiEndpoint,
+            currencies: Object.keys(this.exchangeRates).join(',')
+          });
+          return;
+        } else {
+          Logger.api.warn(`Invalid response format from ${apiEndpoint}`);
+        }
       } catch (error) {
-        Logger.api.error('Failed to update exchange rates', { error, attempt });
-        if (attempt === retryCount) {
-          // Use fallback rates if all attempts fail
-          this.exchangeRates = {
-            EUR: 1,
-            GBP: 0.85,
-            PLN: 4.5,
-            SEK: 11.5
-          };
-          Logger.api.warn('Using fallback exchange rates');
-          return;
-        }
-        // Wait a bit before retrying
-        await new Promise(resolve => setTimeout(resolve, this.RETRY_DELAY));
+        Logger.api.error(`Failed to update exchange rates from ${apiEndpoint}`, { error });
       }
     }
+    
+    // If all API endpoints fail, use fallback rates
+    if (!success) {
+      this.setFallbackRates();
+    }
+  }
+
+  /**
+   * Set fallback exchange rates if API fails
+   */
+  private static setFallbackRates(): void {
+    Logger.api.warn('Using fallback exchange rates');
+    
+    // These are approximate rates as of 2024 - they'll work as fallbacks
+    this.exchangeRates = {
+      EUR: 1,
+      GBP: 0.85,
+      PLN: 4.3,
+      SEK: 11.3,
+      USD: 1.08,
+      CHF: 0.97,
+      CZK: 25.2,
+      DKK: 7.46,
+      NOK: 11.7
+    };
+    
+    this.lastUpdate = Date.now() - this.UPDATE_INTERVAL + 600000; // Set to expire 10 minutes sooner than normal
+    Logger.api.debug('Using fallback rates', { rates: this.exchangeRates });
   }
 
   /**
@@ -70,7 +140,9 @@ export class PriceService {
     
     const rate = this.exchangeRates[fromCurrency];
     if (!rate) {
-      console.warn(`No exchange rate found for ${fromCurrency}, using 1:1 conversion`);
+      Logger.api.warn(`No exchange rate found for ${fromCurrency}, using 1:1 conversion`, { 
+        availableRates: Object.keys(this.exchangeRates).join(',') 
+      });
       return price;
     }
     
@@ -515,68 +587,54 @@ export class PriceService {
   public static async comparePrice(asin: string): Promise<MarketplacePrice[]> {
     await this.updateExchangeRates();
 
-    console.log(`[DEBUG] Starting price comparison for ASIN: ${asin}`);
-    console.log(`[DEBUG] Checking marketplaces:`, Object.keys(this.MARKETPLACES));
+    Logger.price.info(`Starting price comparison for ASIN: ${asin}`);
+    Logger.price.debug(`Checking marketplaces:`, Object.keys(this.MARKETPLACES));
 
-    const pricePromises = Object.keys(this.MARKETPLACES).map(marketplace =>
-      this.fetchMarketplacePrice(marketplace, asin)
-        .then(result => {
-          if (!result) {
-            console.log(`[DEBUG] ${marketplace} returned null for ASIN ${asin}`);
-          }
-          return result;
-        })
-        .catch(error => {
-          console.error(`[DEBUG] Error fetching ${marketplace} for ASIN ${asin}:`, error);
-          return null;
-        })
-    );
+    // Create an array of marketplace fetch functions
+    const fetchTasks = Object.keys(this.MARKETPLACES).map(marketplace => async () => {
+      try {
+        const result = await this.fetchMarketplacePrice(marketplace, asin);
+        if (!result) {
+          Logger.price.debug(`${marketplace} returned null for ASIN ${asin}`);
+        }
+        return result;
+      } catch (error) {
+        Logger.price.error(`Error fetching ${marketplace} for ASIN ${asin}:`, error);
+        return null;
+      }
+    });
 
-    const results = await Promise.allSettled(pricePromises);
+    // Execute fetch tasks with controlled concurrency
+    const results = await asyncPool(fetchTasks);
     
     // Log results for each marketplace
     results.forEach((result, index) => {
       const marketplace = Object.keys(this.MARKETPLACES)[index];
-      if (result.status === 'rejected') {
-        console.error(`[DEBUG] ${marketplace} request rejected:`, result.reason);
-      } else if (!result.value) {
-        console.log(`[DEBUG] ${marketplace} returned no data`);
+      if (!result) {
+        Logger.price.debug(`${marketplace} returned no data`);
       } else {
-        console.log(`[DEBUG] ${marketplace} successful:`, result.value);
+        Logger.price.debug(`${marketplace} successful:`, result);
       }
     });
     
     // Get the current marketplace price first
     const currentMarketplace = window.location.hostname.replace('www.', '');
-    console.log(`[DEBUG] Current marketplace: ${currentMarketplace}`);
+    Logger.price.debug(`Current marketplace: ${currentMarketplace}`);
     
-    const currentMarketplaceResult = results.find(
-      (result): result is PromiseFulfilledResult<MarketplacePrice> => 
-        result.status === 'fulfilled' && 
-        result.value !== null && 
-        result.value.marketplace === currentMarketplace
-    );
+    const currentItem = results.find(item => item && item.marketplace === currentMarketplace);
 
-    if (!currentMarketplaceResult) {
-      console.error('[DEBUG] Could not find current marketplace price');
+    if (!currentItem) {
+      Logger.price.error('Could not find current marketplace price');
       return [];
     }
 
-    const currentItem = currentMarketplaceResult.value;
-    console.log(`[DEBUG] Current marketplace price: ${currentItem.price} ${currentItem.currency}`);
+    Logger.price.debug(`Current marketplace price: ${currentItem.price} ${currentItem.currency}`);
     
-    // Filter out failed requests and null results, keep original prices
+    // Filter out null results, keep original prices
     const filteredResults = results
-      .filter((result): result is PromiseFulfilledResult<MarketplacePrice> => {
-        const isValid = result.status === 'fulfilled' && result.value !== null;
-        if (!isValid) {
-          console.log(`[DEBUG] Filtering out result:`, result);
-        }
-        return isValid;
-      })
-      .map(result => {
-        const item = result.value;
-        console.log(`[DEBUG] Original prices for ${item.marketplace}:`, {
+      .filter((result): result is MarketplacePrice => result !== null)
+      .map(item => {
+        Logger.price.debug(`Original prices for ${item.marketplace}:`, {
           price: item.price,
           currency: item.currency,
           shipping: item.shipping
@@ -596,7 +654,7 @@ export class PriceService {
         return totalA - totalB;
       });
 
-    console.log(`[DEBUG] Final filtered results:`, filteredResults);
+    Logger.price.debug(`Final filtered results:`, filteredResults);
     return filteredResults;
   }
 }
