@@ -109,9 +109,16 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
     return chrome.runtime.getURL(`assets/flags/${countryCode.toLowerCase()}.png`);
   };
 
-  const openSidepanel = () => {
+  const openSettings = () => {
     // Send message to background script to handle popup
-    chrome.runtime.sendMessage({ type: 'CLICK_EXTENSION' });
+    console.log('Opening settings popup via CLICK_EXTENSION message');
+    chrome.runtime.sendMessage({ type: 'CLICK_EXTENSION' })
+      .then(response => {
+        console.log('Response from CLICK_EXTENSION message:', response);
+      })
+      .catch(error => {
+        console.error('Error sending CLICK_EXTENSION message:', error);
+      });
   };
 
   return (
@@ -121,7 +128,7 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
         <div className="header-controls">
           <button 
             className="settings-toggle" 
-            onClick={openSidepanel}
+            onClick={openSettings}
             aria-label={t('common.openSettings')}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -151,96 +158,151 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
         </div>
       </div>
       <div className="price-comparison-content">
-        {/* Add column headers */}
-        <div className="price-column-headers">
-          <div className="column-header-marketplace">
-            {t('priceComparison.headers.marketplace')}
-          </div>
-          <div className="column-header-price-details">
-            <span className="column-header-base-price">
-              {t('priceComparison.headers.price')}
-            </span>
-            {shippingCalculationEnabled && (
-              <>
-                <span className="column-header-shipping">+</span>
-                <span className="column-header-shipping-value">
-                  {t('priceComparison.headers.shipping')}
-                </span>
-                <span className="column-header-equals">=</span>
-                <span className="column-header-total">
-                  {t('priceComparison.headers.total')}
-                </span>
-              </>
-            )}
-          </div>
-          {priceIndicatorEnabled && (
-            <div className="column-header-difference">
-              {t('priceComparison.headers.diff')}
-            </div>
-          )}
-        </div>
-        <div className="price-list">
-          {prices
-            .filter(price => 
-              price.originalPrice && 
-              typeof price.originalShipping === 'number' && 
-              price.marketplace !== currentMarketplace &&
-              selectedMarketplaces.includes(price.marketplace) // Filter by selected marketplaces
-            )
-            .map((price, index) => {
-              const totalPrice = price.originalPrice + (price.originalShipping || 0);
-              const difference = calculatePriceDifference(totalPrice, price.originalCurrency);
-              const priceState = getPriceState(difference);
-              const countryCode = marketplaceToCountry[price.marketplace];
+        {/* Filter prices to display */}
+        {(() => {
+          const filteredPrices = prices.filter(price => 
+            price.originalPrice && 
+            typeof price.originalShipping === 'number' && 
+            price.marketplace !== currentMarketplace &&
+            selectedMarketplaces.includes(price.marketplace)
+          );
 
-              // Convert prices to the selected currency
-              const convertedPrice = convertPrice(price.originalPrice, price.originalCurrency);
-              const convertedShipping = price.originalShipping !== null ? 
-                convertPrice(price.originalShipping, price.originalCurrency) : 
-                0;
-              const convertedTotal = convertedPrice + convertedShipping;
+          // If no alternatives found, show a message
+          if (filteredPrices.length === 0) {
+            return (
+              <div className="no-alternatives">
+                <div className="no-alternatives-content">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M12 8V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M12 16H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  <p>{t('priceComparison.noAlternatives')}</p>
+                </div>
+              </div>
+            );
+          }
 
-              return (
-                <a 
-                  key={index} 
-                  href={price.affiliateLink}
-                  className={`price-item ${priceState}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <div className="marketplace">
-                    {flagDisplayEnabled && (
-                      <img src={getFlagUrl(countryCode)} alt={countryCode} className="flag" />
-                    )}
-                    <span className="country-code">{countryCode}</span>
-                  </div>
-                  <div className="price-details">
-                    {shippingCalculationEnabled ? (
-                      <>
-                        <span className="base-price">{formatPrice(convertedPrice)}</span>
-                        <span className="shipping">+</span>
-                        <span className="shipping-value" data-total={formatPrice(convertedTotal)}>
-                          {price.originalShipping === 0 ? t('common.freeShipping') : formatPrice(convertedShipping)}
-                        </span>
-                        <span className="equals">≈</span>
-                        <span className="total">{formatPrice(convertedTotal)}</span>
-                      </>
-                    ) : (
-                      <span className="base-price">{formatPrice(convertedPrice)}</span>
-                    )}
-                  </div>
-                  {priceIndicatorEnabled && (
-                    <div className={`difference ${priceState}`}>
-                      {difference}
-                    </div>
+          // Otherwise, show the regular price comparison table with headers
+          return (
+            <>
+              {/* Add column headers */}
+              <div className="price-column-headers">
+                <div className="column-header-marketplace">
+                  {t('priceComparison.headers.marketplace')}
+                </div>
+                <div className="column-header-price-details">
+                  <span className="column-header-base-price">
+                    {t('priceComparison.headers.price')}
+                  </span>
+                  {shippingCalculationEnabled && (
+                    <>
+                      <span className="column-header-shipping">+</span>
+                      <span className="column-header-shipping-value">
+                        {t('priceComparison.headers.shipping')}
+                      </span>
+                      <span className="column-header-equals">=</span>
+                      <span className="column-header-total">
+                        {t('priceComparison.headers.total')}
+                      </span>
+                    </>
                   )}
-                </a>
-              );
-            })}
-        </div>
+                </div>
+                {priceIndicatorEnabled && (
+                  <div className="column-header-difference">
+                    {t('priceComparison.headers.diff')}
+                  </div>
+                )}
+              </div>
+              <div className="price-list">
+                {filteredPrices.map((price, index) => {
+                  const totalPrice = price.originalPrice + (price.originalShipping || 0);
+                  const difference = calculatePriceDifference(totalPrice, price.originalCurrency);
+                  const priceState = getPriceState(difference);
+                  const countryCode = marketplaceToCountry[price.marketplace];
+
+                  // Convert prices to the selected currency
+                  const convertedPrice = convertPrice(price.originalPrice, price.originalCurrency);
+                  const convertedShipping = price.originalShipping !== null ? 
+                    convertPrice(price.originalShipping, price.originalCurrency) : 
+                    0;
+                  const convertedTotal = convertedPrice + convertedShipping;
+
+                  return (
+                    <a 
+                      key={index} 
+                      href={price.affiliateLink}
+                      className={`price-item ${priceState}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <div className="marketplace">
+                        {flagDisplayEnabled && (
+                          <img src={getFlagUrl(countryCode)} alt={countryCode} className="flag" />
+                        )}
+                        <span className="country-code">{countryCode}</span>
+                      </div>
+                      <div className="price-details">
+                        {shippingCalculationEnabled ? (
+                          <>
+                            <span className="base-price">{formatPrice(convertedPrice)}</span>
+                            <span className="shipping">+</span>
+                            <span className="shipping-value" data-total={formatPrice(convertedTotal)}>
+                              {price.originalShipping === 0 ? t('common.freeShipping') : formatPrice(convertedShipping)}
+                            </span>
+                            <span className="equals">≈</span>
+                            <span className="total">{formatPrice(convertedTotal)}</span>
+                          </>
+                        ) : (
+                          <span className="base-price">{formatPrice(convertedPrice)}</span>
+                        )}
+                      </div>
+                      {priceIndicatorEnabled && (
+                        <div className={`difference ${priceState}`}>
+                          {difference}
+                        </div>
+                      )}
+                    </a>
+                  );
+                })}
+              </div>
+            </>
+          );
+        })()}
       </div>
       <div className="footer-note">
-        {t('priceComparison.footerNote')}
+        {(() => {
+          // Create a dynamic footer based on enabled settings
+          const footerParts = [];
+          
+          // If shipping calculations are enabled
+          if (shippingCalculationEnabled) {
+            footerParts.push(t('priceComparison.footer.shipping'));
+          }
+          
+          // Always mention currency conversion since prices are always converted
+          footerParts.push(t('priceComparison.footer.currency'));
+          
+          // If price indicator is enabled
+          if (priceIndicatorEnabled) {
+            footerParts.push(t('priceComparison.footer.savings'));
+          }
+          
+          // If we have multiple parts, join them with commas and "and"
+          if (footerParts.length > 1) {
+            const lastPart = footerParts.pop();
+            return t('priceComparison.footer.template', {
+              parts: footerParts.join(', '),
+              last: lastPart
+            });
+          } else if (footerParts.length === 1) {
+            // If we only have one part, use it directly
+            return footerParts[0];
+          } else {
+            // Fallback, though this should never happen
+            return t('priceComparison.footer.default');
+          }
+        })()}
       </div>
     </div>
   );

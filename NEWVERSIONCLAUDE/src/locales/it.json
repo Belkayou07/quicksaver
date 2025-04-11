@@ -45,6 +45,14 @@
             "shipping": "Sped",
             "total": "Totale",
             "diff": "Diff"
+        },
+        "footer": {
+            "shipping": "prezzi includono le spese di spedizione",
+            "currency": "prezzi sono convertiti nella tua valuta",
+            "savings": "indicatori di risparmio mostrano possibili sconti",
+            "template": "Tutti i {{parts}} e {{last}}",
+            "singleTemplate": "{{value}}",
+            "default": "Prezzi mostrati solo per confronto"
         }
     },
     "common": {

@@ -45,6 +45,17 @@
             "shipping": "Ship",
             "total": "Total",
             "diff": "Diff"
+        },
+        "footer": {
+            "shipping": "prices include shipping costs",
+            "currency": "prices are converted to your currency",
+            "savings": "savings indicators show potential discounts",
+            "shippingCapitalized": "Prices include shipping costs",
+            "currencyCapitalized": "Prices are converted to your currency",
+            "savingsCapitalized": "Savings indicators show potential discounts",
+            "template": "All {{parts}} and {{last}}",
+            "singleTemplate": "{{value}}",
+            "default": "Prices shown for comparison only"
         }
     },
     "common": {

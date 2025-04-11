@@ -20,8 +20,7 @@
       "32": "assets/icon32.png",
       "48": "assets/icon48.png",
       "128": "assets/icon128.png"
-    },
-    "default_popup": "popup.html"
+    }
   },
   "side_panel": {
     "default_path": "sidepanel.html"
@@ -72,10 +71,7 @@
       "suggested_key": {
         "default": "Ctrl+Shift+S"
       },
-      "description": "Toggle Quick-Saver Settings"
-    },
-    "toggle-sidepanel": {
-      "description": "Toggle the sidepanel"
+      "description": "Open Quick-Saver Settings"
     }
   },
   "web_accessible_resources": [

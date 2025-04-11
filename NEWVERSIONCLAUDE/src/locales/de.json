@@ -45,6 +45,14 @@
             "shipping": "Versand",
             "total": "Gesamt",
             "diff": "Diff"
+        },
+        "footer": {
+            "shipping": "preise beinhalten versandkosten",
+            "currency": "preise sind in ihre währung umgerechnet",
+            "savings": "sparanzeigen zeigen mögliche rabatte",
+            "template": "Alle {{parts}} und {{last}}",
+            "singleTemplate": "{{value}}",
+            "default": "Preise nur zum Vergleich angezeigt"
         }
     },
     "common": {

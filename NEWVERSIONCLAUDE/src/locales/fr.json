@@ -43,6 +43,14 @@
             "shipping": "Livr",
             "total": "Total",
             "diff": "Diff"
+        },
+        "footer": {
+            "shipping": "prix incluent les frais de livraison",
+            "currency": "prix sont convertis dans votre devise",
+            "savings": "indicateurs d'économies montrent les remises potentielles",
+            "template": "Tous les {{parts}} et {{last}}",
+            "singleTemplate": "{{value}}",
+            "default": "Prix affichés uniquement à titre de comparaison"
         }
     },
     "common": {

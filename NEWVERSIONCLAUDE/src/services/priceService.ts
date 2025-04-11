@@ -2,6 +2,7 @@ import { ProductDetector } from './productDetector';
 import { MarketplacePrice } from '../types/marketplace';
 import { browser } from 'webextension-polyfill-ts';
 import { MARKETPLACES } from '../config/marketplaces';
+import { Logger } from '../utils/logger';
 
 export class PriceService {
   private static EXCHANGE_API_BASE = 'https://api.exchangerate.fun/latest';
@@ -26,22 +27,34 @@ export class PriceService {
       try {
         const currencies = Object.values(this.MARKETPLACES).map(m => m.currency);
         const uniqueCurrencies = [...new Set(currencies)].join(',');
+        
+        // Use a CORS proxy or handle the error gracefully
         const response = await browser.runtime.sendMessage({
           type: 'FETCH_EXCHANGE_RATES',
-          url: `${this.EXCHANGE_API_BASE}?base=EUR&symbols=${uniqueCurrencies}`
+          url: `https://api.exchangerate.host/latest?base=EUR&symbols=${uniqueCurrencies}`
         });
 
         if (!response || !response.rates) {
-          throw new Error('Invalid response format');
+          Logger.api.warn('Invalid exchange rate response format');
+          return;
         }
 
         this.exchangeRates = response.rates;
         this.lastUpdate = now;
+        Logger.api.info('Exchange rates updated successfully');
         return;
       } catch (error) {
-        console.error(`Failed to update exchange rates (attempt ${attempt}/${retryCount}):`, error);
+        Logger.api.error('Failed to update exchange rates', { error, attempt });
         if (attempt === retryCount) {
-          throw error;
+          // Use fallback rates if all attempts fail
+          this.exchangeRates = {
+            EUR: 1,
+            GBP: 0.85,
+            PLN: 4.5,
+            SEK: 11.5
+          };
+          Logger.api.warn('Using fallback exchange rates');
+          return;
         }
         // Wait a bit before retrying
         await new Promise(resolve => setTimeout(resolve, this.RETRY_DELAY));
@@ -83,7 +96,11 @@ export class PriceService {
       });
 
       if (!response.success) {
-        console.error(`[DEBUG] Failed to fetch ${marketplace}:`, response.error);
+        if (response.status === 404) {
+          Logger.price.debug(`Product not available in ${marketplace}`, { asin });
+          return null;
+        }
+        Logger.price.error(`Failed to fetch ${marketplace}`, { error: response.error, asin });
         throw new Error(response.error);
       }
 

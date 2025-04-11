@@ -44,6 +44,14 @@
       "shipping": "Przesyłka",
       "total": "Razem",
       "diff": "Różnica"
+    },
+    "footer": {
+      "shipping": "ceny zawierają koszty wysyłki",
+      "currency": "ceny są przeliczone na Twoją walutę",
+      "savings": "wskaźniki oszczędności pokazują możliwe rabaty",
+      "template": "Wszystkie {{parts}} i {{last}}",
+      "singleTemplate": "{{value}}",
+      "default": "Ceny podane wyłącznie do porównania"
     }
   },
   "common": {

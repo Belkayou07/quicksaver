@@ -45,6 +45,14 @@
             "shipping": "Verz",
             "total": "Totaal",
             "diff": "Versch"
+        },
+        "footer": {
+            "shipping": "prijzen zijn inclusief verzendkosten",
+            "currency": "prijzen zijn omgerekend naar uw valuta",
+            "savings": "besparingsindicatoren tonen mogelijke kortingen",
+            "template": "Alle {{parts}} en {{last}}",
+            "singleTemplate": "{{value}}",
+            "default": "Prijzen alleen ter vergelijking weergegeven"
         }
     },
     "common": {

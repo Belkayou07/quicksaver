@@ -44,6 +44,14 @@
       "shipping": "Frakt",
       "total": "Totalt",
       "diff": "Skillnad"
+    },
+    "footer": {
+      "shipping": "priser inkluderar fraktkostnader",
+      "currency": "priser är omvandlade till din valuta",
+      "savings": "besparingsindikatorer visar potentiella rabatter",
+      "template": "Alla {{parts}} och {{last}}",
+      "singleTemplate": "{{value}}",
+      "default": "Priser visas endast för jämförelse"
     }
   },
   "common": {
