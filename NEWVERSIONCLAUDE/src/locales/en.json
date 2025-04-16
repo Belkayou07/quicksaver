@@ -44,12 +44,16 @@
             "price": "Price",
             "shipping": "Ship",
             "total": "Total",
-            "diff": "Diff"
+            "diff": "Diff",
+            "priceDiff": "Price Diff",
+            "totalDiff": "Total Diff"
         },
         "footer": {
             "shipping": "prices include shipping costs",
             "currency": "prices are converted to your currency",
             "savings": "savings indicators show potential discounts",
+            "savingsWithShipping": "difference calculated using total price (product + shipping)",
+            "savingsNoShipping": "difference calculated using product price only",
             "shippingCapitalized": "Prices include shipping costs",
             "currencyCapitalized": "Prices are converted to your currency",
             "savingsCapitalized": "Savings indicators show potential discounts",

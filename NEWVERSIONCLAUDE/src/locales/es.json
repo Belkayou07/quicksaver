@@ -44,12 +44,16 @@
             "price": "Precio",
             "shipping": "Envío",
             "total": "Total",
-            "diff": "Dif"
+            "diff": "Dif",
+            "priceDiff": "Dif Precio",
+            "totalDiff": "Dif Total"
         },
         "footer": {
             "shipping": "precios incluyen costos de envío",
             "currency": "precios están convertidos a tu moneda",
             "savings": "indicadores de ahorro muestran posibles descuentos",
+            "savingsWithShipping": "diferencia calculada usando precio total (producto + envío)",
+            "savingsNoShipping": "diferencia calculada usando solo precio del producto",
             "template": "Todos los {{parts}} y {{last}}",
             "singleTemplate": "{{value}}",
             "default": "Precios mostrados solo para comparación"

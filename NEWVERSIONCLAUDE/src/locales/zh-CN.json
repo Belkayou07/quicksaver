@@ -18,5 +18,55 @@
             "title": "语言",
             "select": "选择语言"
         }
+    },
+    "countries": {
+        "Belgium": "比利时",
+        "France": "法国",
+        "Germany": "德国",
+        "Italy": "意大利",
+        "Netherlands": "荷兰",
+        "Poland": "波兰",
+        "Spain": "西班牙",
+        "Sweden": "瑞典",
+        "UK": "英国"
+    },
+    "priceComparison": {
+        "title": "替代价格",
+        "footerNote": "价格包含货币换算和运费",
+        "shipping": "运费",
+        "total": "总计",
+        "difference": "差价",
+        "cheapestOption": "最便宜的选项",
+        "currentPrice": "当前价格",
+        "noAlternatives": "未找到替代价格",
+        "headers": {
+            "marketplace": "国家",
+            "price": "价格",
+            "shipping": "运费",
+            "total": "总计",
+            "diff": "差价",
+            "priceDiff": "价格差",
+            "totalDiff": "总差价"
+        },
+        "footer": {
+            "shipping": "价格包含运费",
+            "currency": "价格已转换为您的货币",
+            "savings": "节省指标显示潜在折扣",
+            "savingsWithShipping": "差价使用总价计算（商品+运费）",
+            "savingsNoShipping": "差价仅使用商品价格计算",
+            "shippingCapitalized": "价格包含运费",
+            "currencyCapitalized": "价格已转换为您的货币",
+            "savingsCapitalized": "节省指标显示潜在折扣",
+            "template": "所有{{parts}}和{{last}}",
+            "singleTemplate": "{{value}}",
+            "default": "价格仅供比较"
+        }
+    },
+    "common": {
+        "freeShipping": "免费",
+        "openSettings": "打开设置",
+        "toggleTheme": "切换至{{mode}}模式",
+        "countryFlag": "{{country}}国旗",
+        "visitStore": "访问商店"
     }
 }

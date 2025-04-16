@@ -44,12 +44,16 @@
             "price": "Preis",
             "shipping": "Versand",
             "total": "Gesamt",
-            "diff": "Diff"
+            "diff": "Diff",
+            "priceDiff": "Preis Diff",
+            "totalDiff": "Gesamt Diff"
         },
         "footer": {
             "shipping": "preise beinhalten versandkosten",
             "currency": "preise sind in ihre währung umgerechnet",
             "savings": "sparanzeigen zeigen mögliche rabatte",
+            "savingsWithShipping": "differenz berechnet mit gesamtpreis (produkt + versand)",
+            "savingsNoShipping": "differenz berechnet nur mit produktpreis",
             "template": "Alle {{parts}} und {{last}}",
             "singleTemplate": "{{value}}",
             "default": "Preise nur zum Vergleich angezeigt"

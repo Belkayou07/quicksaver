@@ -68,7 +68,11 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
 
   const currentMarketplace = window.location.hostname.replace('www.', '');
   const currentPrice = prices.find(p => p.marketplace === currentMarketplace);
-  const basePrice = currentPrice ? currentPrice.originalPrice + (currentPrice.originalShipping || 0) : 0;
+  // Define base price and shipping separately
+  const baseProductPrice = currentPrice ? currentPrice.originalPrice : 0;
+  const baseShippingPrice = currentPrice && currentPrice.originalShipping !== null ? currentPrice.originalShipping : 0;
+  // Total price is only used when shipping calculation is enabled
+  const baseTotalPrice = baseProductPrice + baseShippingPrice;
   const baseCurrency = currentPrice ? currentPrice.originalCurrency : 'EUR';
 
   // Convert price from any currency to selected currency
@@ -90,13 +94,43 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
     return `${formatted} ${symbol}`;
   };
 
-  const calculatePriceDifference = (price: number, currency: string): string => {
-    if (!basePrice) return 'N/A';
-    const convertedBasePrice = convertPrice(basePrice, baseCurrency);
-    const convertedPrice = convertPrice(price, currency);
-    const diff = ((convertedPrice - convertedBasePrice) / convertedBasePrice) * 100;
-    if (diff === 0) return '0%';
-    return diff > 0 ? `+${diff.toFixed(0)}%` : `-${Math.abs(diff).toFixed(0)}%`;
+  const calculatePriceDifference = (itemPrice: number, itemShipping: number | null, currency: string): string => {
+    // If there's no base price to compare with, return N/A
+    if (!baseProductPrice) return 'N/A';
+    
+    // Helper function to format the percentage difference
+    const formatPercentageDiff = (diff: number): string => {
+      if (diff === 0) return '0%';
+      return diff > 0 ? `+${diff.toFixed(0)}%` : `-${Math.abs(diff).toFixed(0)}%`;
+    };
+    
+    // When shipping calculation is enabled, compare total prices (product + shipping)
+    // When shipping calculation is disabled, compare only product prices
+    let baseForComparison: number;
+    let itemForComparison: number;
+    
+    if (shippingCalculationEnabled) {
+      // Total price comparison (product + shipping)
+      baseForComparison = baseTotalPrice; // Current marketplace price + shipping
+      itemForComparison = itemPrice + (itemShipping || 0); // Alternative marketplace price + shipping
+      console.log(`[PRICE-DIFF] Shipping ON: Comparing total prices ${baseForComparison} vs ${itemForComparison}`);
+    } else {
+      // Product price comparison only (no shipping)
+      baseForComparison = baseProductPrice; // Current marketplace product price only
+      itemForComparison = itemPrice; // Alternative marketplace product price only
+      console.log(`[PRICE-DIFF] Shipping OFF: Comparing product prices ${baseProductPrice} vs ${itemPrice}`);
+    }
+    
+    // Convert everything to the selected currency
+    const convertedBasePrice = convertPrice(baseForComparison, baseCurrency);
+    const convertedItemPrice = convertPrice(itemForComparison, currency);
+    
+    // Calculate percentage difference
+    const diff = ((convertedItemPrice - convertedBasePrice) / convertedBasePrice) * 100;
+    
+    console.log(`[PRICE-DIFF] Base Price: ${convertedBasePrice} ${currencyCode}, Item Price: ${convertedItemPrice} ${currencyCode}, Diff: ${diff.toFixed(2)}%`);
+    
+    return formatPercentageDiff(diff);
   };
 
   const getPriceState = (difference: string): 'lower' | 'higher' | 'same' => {
@@ -210,14 +244,20 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
                 </div>
                 {priceIndicatorEnabled && (
                   <div className="column-header-difference">
-                    {t('priceComparison.headers.diff')}
+                    {shippingCalculationEnabled 
+                      ? t('priceComparison.headers.totalDiff') 
+                      : t('priceComparison.headers.priceDiff')}
                   </div>
                 )}
               </div>
               <div className="price-list">
                 {filteredPrices.map((price, index) => {
-                  const totalPrice = price.originalPrice + (price.originalShipping || 0);
-                  const difference = calculatePriceDifference(totalPrice, price.originalCurrency);
+                  // Calculate difference based on our conditional logic
+                  const difference = calculatePriceDifference(
+                    price.originalPrice, 
+                    price.originalShipping, 
+                    price.originalCurrency
+                  );
                   const priceState = getPriceState(difference);
                   const countryCode = marketplaceToCountry[price.marketplace];
 
@@ -285,7 +325,11 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
           
           // If price indicator is enabled
           if (priceIndicatorEnabled) {
-            footerParts.push(t('priceComparison.footer.savings'));
+            // Use different savings text based on shipping calculation setting
+            const savingsKey = shippingCalculationEnabled 
+              ? 'priceComparison.footer.savingsWithShipping'
+              : 'priceComparison.footer.savingsNoShipping';
+            footerParts.push(t(savingsKey));
           }
           
           // If we have multiple parts, join them with commas and "and"

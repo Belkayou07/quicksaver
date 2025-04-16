@@ -137,6 +137,38 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     if (message.type === 'UPDATE_DISPLAY_SETTINGS') {
+      // Check if shippingCalculationEnabled setting has changed
+      if (message.settings.shippingCalculationEnabled !== undefined) {
+        // Get the current ASIN
+        const currentUrl = window.location.href;
+        const asin = ProductDetector.extractASIN(currentUrl);
+        
+        if (asin) {
+          // Re-fetch prices with updated sorting
+          console.log('[DEBUG] Shipping calculation setting changed, re-fetching prices');
+          
+          // Use promises instead of async/await
+          PriceService.comparePrice(asin).then(prices => {
+            currentPrices = prices;
+            
+            // Re-render with updated prices
+            if (comparisonRoot && currentPrices.length > 0) {
+              comparisonRoot.render(
+                <PriceComparison 
+                  prices={currentPrices}
+                />
+              );
+            }
+          }).catch(error => {
+            console.error('[DEBUG] Error re-fetching prices:', error);
+          });
+          
+          // Send response immediately without waiting
+          sendResponse({ success: true });
+          return true;
+        }
+      }
+      
       // Re-render the component with the updated display settings
       if (comparisonRoot && currentPrices.length > 0) {
         comparisonRoot.render(

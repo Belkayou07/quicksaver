@@ -18,5 +18,55 @@
             "title": "言語",
             "select": "言語を選択"
         }
+    },
+    "countries": {
+        "Belgium": "ベルギー",
+        "France": "フランス",
+        "Germany": "ドイツ",
+        "Italy": "イタリア",
+        "Netherlands": "オランダ",
+        "Poland": "ポーランド",
+        "Spain": "スペイン",
+        "Sweden": "スウェーデン",
+        "UK": "イギリス"
+    },
+    "priceComparison": {
+        "title": "代替価格",
+        "footerNote": "価格には通貨換算と配送料が含まれています",
+        "shipping": "配送料",
+        "total": "合計",
+        "difference": "差額",
+        "cheapestOption": "最安値オプション",
+        "currentPrice": "現在価格",
+        "noAlternatives": "代替価格が見つかりませんでした",
+        "headers": {
+            "marketplace": "国",
+            "price": "価格",
+            "shipping": "配送",
+            "total": "合計",
+            "diff": "差額",
+            "priceDiff": "価格差",
+            "totalDiff": "合計差額"
+        },
+        "footer": {
+            "shipping": "価格には配送料が含まれています",
+            "currency": "価格はあなたの通貨に換算されています",
+            "savings": "節約表示は潜在的な割引を示しています",
+            "savingsWithShipping": "差額は合計価格（商品+配送）で計算されています",
+            "savingsNoShipping": "差額は商品価格のみで計算されています",
+            "shippingCapitalized": "価格には配送料が含まれています",
+            "currencyCapitalized": "価格はあなたの通貨に換算されています",
+            "savingsCapitalized": "節約表示は潜在的な割引を示しています",
+            "template": "すべての{{parts}}と{{last}}",
+            "singleTemplate": "{{value}}",
+            "default": "価格は比較のためだけに表示されています"
+        }
+    },
+    "common": {
+        "freeShipping": "無料",
+        "openSettings": "設定を開く",
+        "toggleTheme": "{{mode}}モードに切り替え",
+        "countryFlag": "{{country}}の国旗",
+        "visitStore": "ストアを訪問"
     }
 }

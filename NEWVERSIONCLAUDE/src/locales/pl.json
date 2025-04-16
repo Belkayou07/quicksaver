@@ -31,27 +31,31 @@
   },
   "priceComparison": {
     "title": "Alternatywne Ceny",
-    "footerNote": "Ceny zawierają przelicznik walut i wysyłkę",
+    "footerNote": "Ceny zawierają przeliczanie walut i przesyłkę",
     "shipping": "Wysyłka",
-    "total": "Suma",
+    "total": "Razem",
     "difference": "Różnica",
     "cheapestOption": "Najtańsza opcja",
-    "currentPrice": "Obecna cena",
+    "currentPrice": "Aktualna cena",
     "noAlternatives": "Nie znaleziono alternatywnych cen",
     "headers": {
       "marketplace": "Kraj",
       "price": "Cena",
-      "shipping": "Przesyłka",
+      "shipping": "Wysyłka",
       "total": "Razem",
-      "diff": "Różnica"
+      "diff": "Różnica",
+      "priceDiff": "Różnica cenowa",
+      "totalDiff": "Całkowita różnica"
     },
     "footer": {
       "shipping": "ceny zawierają koszty wysyłki",
-      "currency": "ceny są przeliczone na Twoją walutę",
-      "savings": "wskaźniki oszczędności pokazują możliwe rabaty",
+      "currency": "ceny przeliczone na Twoją walutę",
+      "savings": "wskaźniki oszczędności pokazują potencjalne rabaty",
       "template": "Wszystkie {{parts}} i {{last}}",
       "singleTemplate": "{{value}}",
-      "default": "Ceny podane wyłącznie do porównania"
+      "default": "Ceny podane wyłącznie do porównania",
+      "savingsWithShipping": "różnica obliczona na podstawie ceny całkowitej (produkt + wysyłka)",
+      "savingsNoShipping": "różnica obliczona tylko na podstawie ceny produktu"
     }
   },
   "common": {

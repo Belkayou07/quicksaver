@@ -44,12 +44,16 @@
             "price": "Prijs",
             "shipping": "Verz",
             "total": "Totaal",
-            "diff": "Versch"
+            "diff": "Versch",
+            "priceDiff": "Prijs Versch",
+            "totalDiff": "Totaal Versch"
         },
         "footer": {
             "shipping": "prijzen zijn inclusief verzendkosten",
             "currency": "prijzen zijn omgerekend naar uw valuta",
             "savings": "besparingsindicatoren tonen mogelijke kortingen",
+            "savingsWithShipping": "verschil berekend op basis van totaalprijs (product + verzending)",
+            "savingsNoShipping": "verschil berekend op basis van alleen productprijs",
             "template": "Alle {{parts}} en {{last}}",
             "singleTemplate": "{{value}}",
             "default": "Prijzen alleen ter vergelijking weergegeven"

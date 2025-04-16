@@ -43,7 +43,9 @@
       "price": "Pris",
       "shipping": "Frakt",
       "total": "Totalt",
-      "diff": "Skillnad"
+      "diff": "Skillnad",
+      "priceDiff": "Prisskillnad",
+      "totalDiff": "Total Skillnad"
     },
     "footer": {
       "shipping": "priser inkluderar fraktkostnader",
@@ -51,7 +53,9 @@
       "savings": "besparingsindikatorer visar potentiella rabatter",
       "template": "Alla {{parts}} och {{last}}",
       "singleTemplate": "{{value}}",
-      "default": "Priser visas endast för jämförelse"
+      "default": "Priser visas endast för jämförelse",
+      "savingsWithShipping": "skillnad beräknad baserat på totalt pris (produkt + frakt)",
+      "savingsNoShipping": "skillnad beräknad endast på produktpris"
     }
   },
   "common": {

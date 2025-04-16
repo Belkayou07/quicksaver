@@ -18,5 +18,55 @@
             "title": "اللغة",
             "select": "اختر اللغة"
         }
+    },
+    "countries": {
+        "Belgium": "بلجيكا",
+        "France": "فرنسا",
+        "Germany": "ألمانيا",
+        "Italy": "إيطاليا",
+        "Netherlands": "هولندا",
+        "Poland": "بولندا",
+        "Spain": "إسبانيا",
+        "Sweden": "السويد",
+        "UK": "المملكة المتحدة"
+    },
+    "priceComparison": {
+        "title": "الأسعار البديلة",
+        "footerNote": "تشمل الأسعار تحويل العملات والشحن",
+        "shipping": "الشحن",
+        "total": "المجموع",
+        "difference": "الفرق",
+        "cheapestOption": "الخيار الأرخص",
+        "currentPrice": "السعر الحالي",
+        "noAlternatives": "لم يتم العثور على أسعار بديلة",
+        "headers": {
+            "marketplace": "البلد",
+            "price": "السعر",
+            "shipping": "الشحن",
+            "total": "المجموع",
+            "diff": "الفرق",
+            "priceDiff": "فرق السعر",
+            "totalDiff": "فرق المجموع"
+        },
+        "footer": {
+            "shipping": "الأسعار تشمل تكاليف الشحن",
+            "currency": "تم تحويل الأسعار إلى عملتك",
+            "savings": "مؤشرات التوفير تظهر الخصومات المحتملة",
+            "savingsWithShipping": "يتم حساب الفرق باستخدام السعر الإجمالي (المنتج + الشحن)",
+            "savingsNoShipping": "يتم حساب الفرق باستخدام سعر المنتج فقط",
+            "shippingCapitalized": "الأسعار تشمل تكاليف الشحن",
+            "currencyCapitalized": "تم تحويل الأسعار إلى عملتك",
+            "savingsCapitalized": "مؤشرات التوفير تظهر الخصومات المحتملة",
+            "template": "جميع {{parts}} و{{last}}",
+            "singleTemplate": "{{value}}",
+            "default": "الأسعار معروضة للمقارنة فقط"
+        }
+    },
+    "common": {
+        "freeShipping": "مجاني",
+        "openSettings": "فتح الإعدادات",
+        "toggleTheme": "التبديل إلى وضع {{mode}}",
+        "countryFlag": "علم {{country}}",
+        "visitStore": "زيارة المتجر"
     }
 }
