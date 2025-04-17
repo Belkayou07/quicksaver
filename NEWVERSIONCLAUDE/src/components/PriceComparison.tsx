@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MarketplacePrice } from '../types/marketplace';
 import { marketplaceToCountry } from '../config/marketplaces';
@@ -19,6 +19,30 @@ const currencySymbols: Record<string, string> = {
   SEK: 'kr'
 };
 
+// Define responsive breakpoints
+const BREAKPOINTS = {
+  // Scenario 1: Shipping ON, Savings ON
+  SHIPPING_ON_SAVINGS_ON: {
+    SHIPPING_HIDDEN: 500,
+    PRODUCT_PRICE_HIDDEN: 440,
+    SAVINGS_HIDDEN: 380
+  },
+  // Scenario 2: Shipping ON, Savings OFF
+  SHIPPING_ON_SAVINGS_OFF: {
+    SHIPPING_HIDDEN: 440,
+    PRODUCT_PRICE_HIDDEN: 380
+  },
+  // Scenario 3: Shipping OFF, Savings ON
+  SHIPPING_OFF_SAVINGS_ON: {
+    LAYOUT_COMPACT: 420,
+    SAVINGS_HIDDEN: 360
+  },
+  // Scenario 4: Shipping OFF, Savings OFF 
+  SHIPPING_OFF_SAVINGS_OFF: {
+    SUPER_COMPACT: 340
+  }
+};
+
 export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
   const { t } = useTranslation();
   const { theme, loadTheme } = useThemeStore();
@@ -34,12 +58,87 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
   } = useSettingsStore();
   const { selectedMarketplaces } = useMarketplaceStore();
   const [exchangeRates, setExchangeRates] = useState<Record<string, number>>({});
+  const [responsiveState, setResponsiveState] = useState({
+    hideShipping: false,
+    hideProductPrice: false,
+    hideSavings: false,
+    compactLayout: false,
+    superCompact: false
+  });
+  const compRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     // Load all settings on mount
     loadSettings();
     loadTheme();
     loadLanguage();
+
+    // Check for responsive breakpoints based on active scenario
+    const checkContainerWidth = () => {
+      const container = document.getElementById('quick-saver-price-comparison');
+      if (!container) return;
+
+      const width = container.offsetWidth;
+      console.log(`[Quick-Saver] Container width: ${width}px`);
+      
+      // Determine active scenario
+      const activeScenario = 
+        shippingCalculationEnabled && priceIndicatorEnabled ? 'SHIPPING_ON_SAVINGS_ON' :
+        shippingCalculationEnabled && !priceIndicatorEnabled ? 'SHIPPING_ON_SAVINGS_OFF' :
+        !shippingCalculationEnabled && priceIndicatorEnabled ? 'SHIPPING_OFF_SAVINGS_ON' :
+        'SHIPPING_OFF_SAVINGS_OFF';
+        
+      console.log(`[Quick-Saver] Active scenario: ${activeScenario}`);
+        
+      // Apply responsive state based on active scenario and width
+      switch(activeScenario) {
+        case 'SHIPPING_ON_SAVINGS_ON':
+          setResponsiveState({
+            hideShipping: width < BREAKPOINTS.SHIPPING_ON_SAVINGS_ON.SHIPPING_HIDDEN,
+            hideProductPrice: width < BREAKPOINTS.SHIPPING_ON_SAVINGS_ON.PRODUCT_PRICE_HIDDEN,
+            hideSavings: width < BREAKPOINTS.SHIPPING_ON_SAVINGS_ON.SAVINGS_HIDDEN,
+            compactLayout: false,
+            superCompact: false
+          });
+          break;
+        
+        case 'SHIPPING_ON_SAVINGS_OFF':
+          setResponsiveState({
+            hideShipping: width < BREAKPOINTS.SHIPPING_ON_SAVINGS_OFF.SHIPPING_HIDDEN,
+            hideProductPrice: width < BREAKPOINTS.SHIPPING_ON_SAVINGS_OFF.PRODUCT_PRICE_HIDDEN,
+            hideSavings: true, // Always hidden in this scenario
+            compactLayout: false,
+            superCompact: false
+          });
+          break;
+          
+        case 'SHIPPING_OFF_SAVINGS_ON':
+          setResponsiveState({
+            hideShipping: true, // Always hidden in this scenario
+            hideProductPrice: false, // Always visible in this scenario
+            hideSavings: width < BREAKPOINTS.SHIPPING_OFF_SAVINGS_ON.SAVINGS_HIDDEN,
+            compactLayout: width < BREAKPOINTS.SHIPPING_OFF_SAVINGS_ON.LAYOUT_COMPACT,
+            superCompact: false
+          });
+          break;
+          
+        case 'SHIPPING_OFF_SAVINGS_OFF':
+          setResponsiveState({
+            hideShipping: true, // Always hidden in this scenario
+            hideProductPrice: false, // Always visible in this scenario
+            hideSavings: true, // Always hidden in this scenario
+            compactLayout: false,
+            superCompact: width < BREAKPOINTS.SHIPPING_OFF_SAVINGS_OFF.SUPER_COMPACT
+          });
+          break;
+      }
+    };
+
+    // Check initially
+    checkContainerWidth();
+    
+    // And check on resize
+    window.addEventListener('resize', checkContainerWidth);
 
     // Fetch exchange rates
     const fetchRates = async () => {
@@ -58,7 +157,11 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
     };
 
     fetchRates();
-  }, [loadSettings, loadTheme, loadLanguage]);
+
+    return () => {
+      window.removeEventListener('resize', checkContainerWidth);
+    };
+  }, [loadSettings, loadTheme, loadLanguage, shippingCalculationEnabled, priceIndicatorEnabled]);
 
   // Don't render until we've loaded the initial state
   if (!initialized) return null;
@@ -156,7 +259,12 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
   };
 
   return (
-    <div className={`price-comparison ${theme}`}>
+    <div ref={compRef} className={`price-comparison ${theme} 
+      ${responsiveState.hideShipping ? 'hide-shipping' : ''} 
+      ${responsiveState.hideProductPrice ? 'hide-product-price' : ''} 
+      ${responsiveState.hideSavings ? 'hide-savings' : ''}
+      ${responsiveState.compactLayout ? 'compact-layout' : ''}
+      ${responsiveState.superCompact ? 'super-compact' : ''}`}>
       <div className="price-comparison-header">
         <h3>{t('priceComparison.title')}</h3>
         <div className="header-controls">
@@ -268,11 +376,15 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
                     0;
                   const convertedTotal = convertedPrice + convertedShipping;
 
+                  // Add specific class when we have shipping
+                  const hasShipping = price.originalShipping !== null && price.originalShipping !== 0;
+                  const priceItemClass = `price-item ${hasShipping ? 'has-shipping' : ''} ${priceState}`;
+
                   return (
                     <a 
                       key={index} 
                       href={price.affiliateLink}
-                      className={`price-item ${priceState}`}
+                      className={priceItemClass}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -288,7 +400,7 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
                             <span className="base-price">{formatPrice(convertedPrice)}</span>
                             <span className="shipping">+</span>
                             <span className="shipping-value" data-total={formatPrice(convertedTotal)}>
-                              {price.originalShipping === 0 ? t('common.freeShipping') : formatPrice(convertedShipping)}
+                              {hasShipping ? formatPrice(convertedShipping) : t('common.freeShipping')}
                             </span>
                             <span className="equals">≈</span>
                             <span className="total">{formatPrice(convertedTotal)}</span>

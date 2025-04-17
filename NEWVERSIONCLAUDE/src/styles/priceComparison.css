@@ -98,7 +98,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 12px 4px 12px;
+  padding: 0 12px 4px 16px;
   font-size: 10px;
   color: rgba(255, 255, 255, 0.7);
   text-transform: uppercase;
@@ -113,19 +113,24 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.column-header-marketplace {
+.column-header-marketplace,
+.marketplace {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   width: 80px;
   flex-shrink: 0;
-  text-align: left;
-  font-weight: 600;
 }
 
-.column-header-price-details {
+.column-header-price-details,
+.price-details {
   display: flex;
   align-items: center;
   flex: 1;
   margin: 0 16px;
   gap: 8px;
+  justify-content: flex-end;
+  margin-right: 0;
 }
 
 .column-header-base-price {
@@ -135,36 +140,45 @@
   padding-right: 4px;
 }
 
-.column-header-shipping {
+.price-details .base-price {
+  text-align: right;
+  min-width: 50px;
+  flex: 1;
+}
+
+.column-header-shipping,
+.price-details .shipping {
   text-align: center;
   width: 20px;
   flex: 0 0 auto;
   margin: 0 4px;
-  opacity: 0.7;
 }
 
-.column-header-shipping-value {
+.column-header-shipping-value,
+.price-details .shipping-value {
   text-align: right;
   min-width: 50px;
   flex: 1;
   padding-right: 4px;
 }
 
-.column-header-equals {
+.column-header-equals,
+.price-details .equals {
   text-align: center;
   width: 20px;
   flex: 0 0 auto;
   margin: 0 4px;
-  opacity: 0.7;
 }
 
-.column-header-total {
+.column-header-total,
+.price-details .total {
   text-align: right;
   min-width: 50px;
   flex: 1;
 }
 
-.column-header-difference {
+.column-header-difference,
+.difference {
   width: 60px;
   text-align: center;
   flex-shrink: 0;
@@ -222,7 +236,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px;
+  padding: 12px 16px 12px 12px;
   text-decoration: none !important;
   color: inherit;
   transition: all 0.2s ease;
@@ -289,14 +303,6 @@
   background-color: #f5f5f5;
 }
 
-.marketplace {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 80px;
-  flex-shrink: 0;
-}
-
 .flag {
   width: 20px;
   height: 15px;
@@ -330,34 +336,6 @@
 
 .price-details > * {
   white-space: nowrap;
-}
-
-.price-details .base-price {
-  text-align: right;
-  min-width: 50px;
-  flex: 1;
-}
-
-.price-details .shipping-value {
-  text-align: right;
-  min-width: 50px;
-  flex: 1;
-}
-
-.price-details .total {
-  text-align: right;
-  min-width: 50px;
-  flex: 1;
-}
-
-.price-details .shipping,
-.price-details .equals {
-  text-align: center;
-  width: 20px;
-  opacity: 0.7;
-  flex: 0 0 auto;
-  margin: 0 4px;
-  font-size: 14px;
 }
 
 .base-price {
@@ -480,8 +458,7 @@
   }
 
   .marketplace {
-    width: 50px;
-    margin-right: 8px;
+    gap: 6px;
   }
 
   .price-details {
@@ -514,8 +491,7 @@
   }
 
   .marketplace {
-    width: auto;
-    margin-bottom: 4px;
+    gap: 5px;
   }
 
   .price-details {
@@ -574,27 +550,32 @@
 
 /* Responsive adjustments for column headers */
 @media (max-width: 480px) {
-  .column-header-marketplace {
+  .column-header-marketplace,
+  .marketplace {
     width: 50px;
     margin-right: 8px;
   }
   
-  .column-header-price-details {
+  .column-header-price-details,
+  .price-details {
     gap: 4px;
   }
   
   .column-header-shipping,
-  .column-header-equals {
+  .column-header-equals,
+  .price-details .shipping,
+  .price-details .equals {
     width: 15px;
   }
   
-  .column-header-difference {
-    width: 60px; /* Keep fixed width to match price items at this breakpoint */
+  .column-header-difference,
+  .difference {
+    width: 60px;
     text-align: center;
   }
   
-  /* Ensure padding matches price items at this breakpoint */
-  .price-column-headers {
+  .price-column-headers,
+  .price-item {
     padding-left: 16px;
     padding-right: 12px;
   }
@@ -602,7 +583,7 @@
 
 @media (max-width: 379px) {
   .price-column-headers {
-    display: none; /* Hide headers on very small screens */
+    display: flex; /* Changed from 'none' to ensure headers are visible */
   }
 }
 
@@ -632,4 +613,281 @@
 
 .price-column-headers:not(:has(+ .price-list .price-item .difference)) .column-header-price-details {
   justify-content: flex-end;
+}
+
+/* Remove the previous responsive code */
+.price-comparison.narrow-layout .price-column-headers,
+.price-comparison.narrow-layout .price-item .shipping,
+.price-comparison.narrow-layout .price-item .equals,
+.price-comparison.narrow-layout .price-item .shipping-value,
+.price-comparison.narrow-layout .difference,
+.price-comparison.narrow-layout .price-item:has(.total) .base-price {
+  display: none;
+}
+
+.price-comparison.narrow-layout .price-item .total,
+.price-comparison.narrow-layout .price-details,
+.price-comparison.narrow-layout .price-item {
+  display: initial;
+  min-width: initial;
+  margin: initial;
+  padding: initial;
+}
+
+/* Progressive responsive styles based on container width */
+
+/* 1. When width < 500px: Hide shipping elements */
+.price-comparison.hide-shipping .shipping,
+.price-comparison.hide-shipping .equals,
+.price-comparison.hide-shipping .shipping-value {
+  display: none !important;
+}
+
+/* Also hide the column headers for these elements */
+.price-comparison.hide-shipping .column-header-shipping,
+.price-comparison.hide-shipping .column-header-shipping-value,
+.price-comparison.hide-shipping .column-header-equals {
+  display: none !important;
+}
+
+/* Show total price when shipping is hidden */
+.price-comparison.hide-shipping .total {
+  display: inline !important;
+}
+
+/* 2. When width < 440px: Hide product price */
+.price-comparison.hide-product-price .base-price {
+  display: none !important;
+}
+
+/* Hide the column header for base price */
+.price-comparison.hide-product-price .column-header-base-price {
+  display: none !important;
+}
+
+/* Make total price more prominent when base price is hidden */
+.price-comparison.hide-product-price .total {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* 3. When width < 380px: Hide savings indicator */
+.price-comparison.hide-savings .difference {
+  display: none !important;
+}
+
+/* Hide the column header for difference */
+.price-comparison.hide-savings .column-header-difference {
+  display: none !important;
+}
+
+/* Adjust the layout when savings indicator is hidden */
+.price-comparison.hide-savings .price-details {
+  margin-right: 0;
+}
+
+/* When all three elements are hidden, ensure proper layout */
+.price-comparison.hide-shipping.hide-product-price.hide-savings .price-item {
+  padding: 6px 8px !important;
+}
+
+.price-comparison.hide-shipping.hide-product-price.hide-savings .marketplace {
+  max-width: 50% !important;
+}
+
+.price-comparison.hide-shipping.hide-product-price.hide-savings .price-details {
+  min-width: 50% !important;
+  justify-content: flex-end !important;
+  margin-left: 8px !important;
+}
+
+/* Add more specific selectors for when only total price is shown */
+.price-comparison.hide-shipping.hide-product-price .total {
+  font-size: 16px;
+  font-weight: 700;
+  display: block !important;
+}
+
+/* When shipping is hidden, make sure total is shown */
+.price-comparison.hide-shipping .has-shipping .total {
+  display: inline-block !important; 
+}
+
+/* Make compact layout for very small widths */
+.price-comparison.hide-shipping.hide-product-price.hide-savings .price-item {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Make flag smaller in very compact mode */
+.price-comparison.hide-shipping.hide-product-price.hide-savings .flag {
+  width: 16px;
+  height: 12px;
+}
+
+/* Add styles to ensure column headers remain visible */
+.price-comparison.hide-shipping.hide-product-price.hide-savings .price-column-headers {
+  display: flex !important;
+  padding: 0 8px 4px 16px;
+}
+
+.price-comparison.hide-shipping.hide-product-price .column-header-marketplace {
+  display: block !important;
+}
+
+.price-comparison.hide-shipping.hide-product-price .column-header-price-details {
+  display: flex !important;
+  justify-content: flex-end;
+}
+
+.price-comparison.hide-shipping.hide-product-price .column-header-total {
+  display: block !important;
+  text-align: right;
+}
+
+/* Adjust column headers spacing at small widths */
+.price-comparison.hide-shipping.hide-product-price .price-column-headers {
+  gap: 8px;
+}
+
+/* Override the media query that hides headers at small screens */
+@media (max-width: 379px) {
+  .price-comparison .price-column-headers {
+    display: flex; /* Changed from 'none' to ensure headers are visible */
+  }
+}
+
+/* Adjust the base price weight when shipping is enabled - make this more specific to override other rules */
+.price-comparison .price-item .base-price {
+  font-weight: 400 !important; /* Normal weight for all base prices */
+}
+
+/* Keep total price bold when shipping is enabled */
+.price-comparison .price-item .total {
+  font-weight: 600 !important; /* Keep total price bold */
+}
+
+/* When shipping is disabled, keep base price slightly bolder since it's the only price shown */
+.price-comparison .price-details:not(:has(.shipping)) .base-price {
+  font-weight: 700 !important;
+  text-align: center;
+  width: 100%;
+}
+
+/* Scenario 3: Shipping OFF, Savings ON - Compact Layout */
+.price-comparison.compact-layout .price-item {
+  padding: 8px 10px !important;
+}
+
+.price-comparison.compact-layout .marketplace {
+  width: 60px !important;
+  gap: 6px;
+}
+
+.price-comparison.compact-layout .flag {
+  width: 18px;
+  height: 14px;
+}
+
+.price-comparison.compact-layout .price-details {
+  min-width: 60px !important;
+  margin: 0 8px !important;
+}
+
+.price-comparison.compact-layout .difference {
+  width: 50px !important;
+  font-size: 12px !important;
+  padding: 2px 4px !important;
+}
+
+/* Scenario 4: Shipping OFF, Savings OFF - Super Compact Layout */
+.price-comparison.super-compact .price-item {
+  padding: 6px 8px !important;
+}
+
+.price-comparison.super-compact .marketplace {
+  width: 40% !important;
+  gap: 4px;
+}
+
+.price-comparison.super-compact .flag {
+  width: 16px;
+  height: 12px;
+}
+
+.price-comparison.super-compact .country-code {
+  font-size: 12px !important;
+}
+
+.price-comparison.super-compact .price-details {
+  min-width: 60px !important;
+  margin: 0 4px !important;
+}
+
+.price-comparison.super-compact .base-price {
+  font-size: 13px !important;
+}
+
+.price-comparison.super-compact .column-header-marketplace,
+.price-comparison.super-compact .column-header-base-price {
+  font-size: 9px !important;
+}
+
+/* Additional adjustments for when both compact classes are applied */
+.price-comparison.compact-layout.hide-savings .price-item,
+.price-comparison.super-compact.hide-shipping .price-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+/* Adjustments for very narrow containers across all scenarios */
+.price-comparison.hide-shipping.hide-product-price.hide-savings .price-item,
+.price-comparison.hide-shipping.hide-savings.compact-layout .price-item,
+.price-comparison.super-compact .price-item {
+  min-height: 36px !important;
+}
+
+/* For Scenario 2: Ensure the total price is prominently displayed when shipping is hidden */
+.price-comparison.hide-shipping:not(.hide-product-price) .total {
+  font-weight: 700 !important;
+  font-size: 15px !important;
+}
+
+/* Add footer visibility rules for all responsive scenarios */
+
+/* Scenario 1: Shipping ON, Savings ON - Hide footer in most compact view */
+.price-comparison.hide-shipping.hide-product-price.hide-savings .footer-note {
+  display: none !important;
+}
+
+/* Scenario 2: Shipping ON, Savings OFF - Hide footer in most compact view */
+.price-comparison.hide-shipping.hide-product-price:not(.hide-savings) .footer-note {
+  display: none !important;
+}
+
+/* Scenario 3: Shipping OFF, Savings ON - Hide footer when compact and savings hidden */
+.price-comparison.compact-layout.hide-savings:not(.hide-shipping) .footer-note {
+  display: none !important;
+}
+
+/* Scenario 4: Shipping OFF, Savings OFF - Hide footer in super compact view */
+.price-comparison.super-compact .footer-note {
+  display: none !important;
+}
+
+/* General rule when width is extremely limited */
+@media (max-width: 340px) {
+  .price-comparison .footer-note {
+    display: none !important;
+  }
+}
+
+/* Make padding consistent when footer is hidden to save space */
+.price-comparison:has(.footer-note[style*="display: none"]),
+.price-comparison:has(.footer-note.hidden),
+.price-comparison .footer-note:not(:visible) {
+  padding-bottom: 4px !important;
 }
