@@ -856,38 +856,28 @@
   font-size: 15px !important;
 }
 
-/* Add footer visibility rules for all responsive scenarios */
-
-/* Scenario 1: Shipping ON, Savings ON - Hide footer in most compact view */
-.price-comparison.hide-shipping.hide-product-price.hide-savings .footer-note {
-  display: none !important;
+/* Make sure column headers align perfectly with content */
+.price-column-headers {
+  padding-left: 16px; /* Matches the left padding of price items + border */
+  padding-right: 12px; /* Matches the right padding of price items */
 }
 
-/* Scenario 2: Shipping ON, Savings OFF - Hide footer in most compact view */
-.price-comparison.hide-shipping.hide-product-price:not(.hide-savings) .footer-note {
-  display: none !important;
-}
-
-/* Scenario 3: Shipping OFF, Savings ON - Hide footer when compact and savings hidden */
-.price-comparison.compact-layout.hide-savings:not(.hide-shipping) .footer-note {
-  display: none !important;
-}
-
-/* Scenario 4: Shipping OFF, Savings OFF - Hide footer in super compact view */
-.price-comparison.super-compact .footer-note {
-  display: none !important;
-}
-
-/* General rule when width is extremely limited */
-@media (max-width: 340px) {
-  .price-comparison .footer-note {
+/* Hide footer text for all scenarios at small widths */
+@media (max-width: 380px) {
+  .footer-note {
     display: none !important;
   }
 }
 
-/* Make padding consistent when footer is hidden to save space */
-.price-comparison:has(.footer-note[style*="display: none"]),
-.price-comparison:has(.footer-note.hidden),
-.price-comparison .footer-note:not(:visible) {
-  padding-bottom: 4px !important;
+/* Hide footer when we're in compact modes */
+.price-comparison.compact-layout .footer-note,
+.price-comparison.super-compact .footer-note {
+  display: none !important;
 }
+
+/* Also hide footer when in specific responsive states */
+.price-comparison.hide-savings .footer-note {
+  display: none !important;
+}
+
+/* Progressive responsive styles based on container width */
