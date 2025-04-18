@@ -10,6 +10,8 @@
   padding-bottom: 8px;
   color: #ffffff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  position: relative;
 }
 
 .price-comparison.light {
@@ -189,6 +191,8 @@
   flex-direction: column;
   gap: 8px;
   margin-bottom: 16px;
+  overflow: visible;
+  position: relative;
 }
 
 /* No alternatives message */
@@ -880,4 +884,184 @@
   display: none !important;
 }
 
-/* Progressive responsive styles based on container width */
+/* Hover tooltip for responsive views - shows all info when elements are hidden */
+.price-item {
+  position: relative; /* Ensure proper positioning of tooltip */
+}
+
+/* Info tooltip indicator - only shows when elements are hidden */
+.price-item::after {
+  content: "ℹ️";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Only show the info indicator when at least one element is hidden */
+.price-comparison.hide-shipping .price-item::after,
+.price-comparison.hide-product-price .price-item::after,
+.price-comparison.hide-savings .price-item::after,
+.price-comparison.compact-layout .price-item::after,
+.price-comparison.super-compact .price-item::after {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* The tooltip container - force it to be fully opaque, not transparent */
+.price-item .tooltip {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  margin-top: -10px;
+  background-color: #000000; /* Full opacity, solid black */
+  color: white;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 12px;
+  min-width: 150px;
+  max-width: 200px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: visible; /* Change from auto to visible to remove scrollbar */
+}
+
+/* Add arrow pointing to the item */
+.price-item .tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px 8px 0;
+  border-style: solid;
+  border-color: #000000 transparent transparent;
+}
+
+.light .price-item .tooltip {
+  background-color: #e0e0e0; /* Full opacity, solid light grey */
+  color: black;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.light .price-item .tooltip::after {
+  border-color: #e0e0e0 transparent transparent;
+}
+
+/* Show tooltip on hover but only when at least one element is hidden */
+.price-comparison.hide-shipping .price-item:hover .tooltip,
+.price-comparison.hide-product-price .price-item:hover .tooltip,
+.price-comparison.hide-savings .price-item:hover .tooltip,
+.price-comparison.compact-layout .price-item:hover .tooltip,
+.price-comparison.super-compact .price-item:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Tooltip content styling */
+.tooltip .tooltip-marketplace {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.light .tooltip .tooltip-marketplace {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.tooltip .tooltip-flag {
+  width: 16px;
+  height: 12px;
+  object-fit: cover;
+  border-radius: 2px;
+}
+
+.tooltip .tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  line-height: 1.2;
+}
+
+.tooltip .tooltip-label {
+  opacity: 0.7;
+  font-size: 10px;
+  margin-right: 8px;
+}
+
+.tooltip .tooltip-value {
+  font-weight: 500;
+  text-align: right;
+}
+
+.tooltip .tooltip-total {
+  font-weight: 600;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding-top: 4px;
+  margin-top: 4px;
+}
+
+.light .tooltip .tooltip-total {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.tooltip .tooltip-savings {
+  margin-top: 4px;
+  justify-content: flex-end;
+  font-weight: 600;
+}
+
+.tooltip .lower {
+  color: #22c55e;
+}
+
+.tooltip .higher {
+  color: #ef4444;
+}
+
+.tooltip .same {
+  color: #6b7280;
+}
+
+/* Mobile adjustment for tooltip to prevent overflow */
+@media (max-width: 480px) {
+  .price-item .tooltip {
+    min-width: 120px;
+    left: 0;
+    transform: translateY(-100%);
+    margin-top: -10px;
+  }
+  
+  /* For items on the right side of the container */
+  .price-item:nth-child(even) .tooltip {
+    left: auto;
+    right: 0;
+    transform: translateY(-100%);
+  }
+}
+
+/* Ensure tooltip appears on top of other elements */
+.price-item {
+  position: relative;
+  z-index: 1;
+}
+
+.price-item:hover {
+  z-index: 10;
+}

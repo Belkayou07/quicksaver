@@ -203,8 +203,8 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
     
     // Helper function to format the percentage difference
     const formatPercentageDiff = (diff: number): string => {
-      if (diff === 0) return '0%';
-      return diff > 0 ? `+${diff.toFixed(0)}%` : `-${Math.abs(diff).toFixed(0)}%`;
+    if (diff === 0) return '0%';
+    return diff > 0 ? `+${diff.toFixed(0)}%` : `-${Math.abs(diff).toFixed(0)}%`;
     };
     
     // When shipping calculation is enabled, compare total prices (product + shipping)
@@ -256,6 +256,114 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
       .catch(error => {
         console.error('Error sending CLICK_EXTENSION message:', error);
       });
+  };
+
+  const renderPriceItem = (price: MarketplacePrice, index: number) => {
+    // Calculate difference based on our conditional logic
+    const difference = calculatePriceDifference(
+      price.originalPrice, 
+      price.originalShipping, 
+      price.originalCurrency
+    );
+    const priceState = getPriceState(difference);
+    const countryCode = marketplaceToCountry[price.marketplace];
+
+    // Convert prices to the selected currency
+    const convertedPrice = convertPrice(price.originalPrice, price.originalCurrency);
+    const convertedShipping = price.originalShipping !== null ? 
+      convertPrice(price.originalShipping, price.originalCurrency) : 
+      0;
+    const convertedTotal = convertedPrice + convertedShipping;
+
+    // Add specific class when we have shipping
+    const hasShipping = price.originalShipping !== null && price.originalShipping !== 0;
+    const priceItemClass = `price-item ${hasShipping ? 'has-shipping' : ''} ${priceState}`;
+
+    // Check if the tooltip should be shown based on our responsive state
+    const shouldShowTooltip = responsiveState.hideShipping || 
+                             responsiveState.hideProductPrice || 
+                             responsiveState.hideSavings ||
+                             responsiveState.compactLayout ||
+                             responsiveState.superCompact;
+
+    return (
+      <a 
+        key={index} 
+        href={price.affiliateLink}
+        className={priceItemClass}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <div className="marketplace">
+          {flagDisplayEnabled && (
+            <img src={getFlagUrl(countryCode)} alt={countryCode} className="flag" />
+          )}
+          <span className="country-code">{countryCode}</span>
+        </div>
+        <div className="price-details">
+          {shippingCalculationEnabled ? (
+            <>
+              <span className="base-price">{formatPrice(convertedPrice)}</span>
+              <span className="shipping">+</span>
+              <span className="shipping-value" data-total={formatPrice(convertedTotal)}>
+                {hasShipping ? formatPrice(convertedShipping) : t('common.freeShipping')}
+              </span>
+              <span className="equals">≈</span>
+              <span className="total">{formatPrice(convertedTotal)}</span>
+            </>
+          ) : (
+            <span className="base-price">{formatPrice(convertedPrice)}</span>
+          )}
+        </div>
+        {priceIndicatorEnabled && (
+          <div className={`difference ${priceState}`}>
+            {difference}
+          </div>
+        )}
+        
+        {/* Tooltip with only hidden information - shown on hover when elements are hidden */}
+        {shouldShowTooltip && (
+          <div className="tooltip">
+            {/* Always show marketplace in tooltip for context */}
+            <div className="tooltip-marketplace">
+              <img src={getFlagUrl(countryCode)} alt={countryCode} className="tooltip-flag" />
+              <span>{countryCode}</span>
+            </div>
+            
+            {/* Always show base price */}
+            <div className="tooltip-row">
+              <span className="tooltip-label">{t('priceComparison.headers.price')}</span>
+              <span className="tooltip-value">{formatPrice(convertedPrice)}</span>
+            </div>
+            
+            {/* Only show shipping if shipping calculation is enabled */}
+            {shippingCalculationEnabled && (
+              <div className="tooltip-row">
+                <span className="tooltip-label">{t('priceComparison.headers.shipping')}</span>
+                <span className="tooltip-value">
+                  {hasShipping ? formatPrice(convertedShipping) : t('common.freeShipping')}
+                </span>
+              </div>
+            )}
+            
+            {/* Only show total if shipping calculation is enabled */}
+            {shippingCalculationEnabled && (
+              <div className="tooltip-row tooltip-total">
+                <span className="tooltip-label">{t('priceComparison.headers.total')}</span>
+                <span className="tooltip-value">{formatPrice(convertedTotal)}</span>
+              </div>
+            )}
+            
+            {/* Only show savings if price indicator is enabled */}
+            {priceIndicatorEnabled && (
+              <div className={`tooltip-row tooltip-savings ${priceState}`}>
+                <span className="tooltip-value">{difference}</span>
+              </div>
+            )}
+          </div>
+        )}
+      </a>
+    );
   };
 
   return (
@@ -359,64 +467,7 @@ export const PriceComparison: React.FC<PriceComparisonProps> = ({ prices }) => {
                 )}
               </div>
               <div className="price-list">
-                {filteredPrices.map((price, index) => {
-                  // Calculate difference based on our conditional logic
-                  const difference = calculatePriceDifference(
-                    price.originalPrice, 
-                    price.originalShipping, 
-                    price.originalCurrency
-                  );
-                  const priceState = getPriceState(difference);
-                  const countryCode = marketplaceToCountry[price.marketplace];
-
-                  // Convert prices to the selected currency
-                  const convertedPrice = convertPrice(price.originalPrice, price.originalCurrency);
-                  const convertedShipping = price.originalShipping !== null ? 
-                    convertPrice(price.originalShipping, price.originalCurrency) : 
-                    0;
-                  const convertedTotal = convertedPrice + convertedShipping;
-
-                  // Add specific class when we have shipping
-                  const hasShipping = price.originalShipping !== null && price.originalShipping !== 0;
-                  const priceItemClass = `price-item ${hasShipping ? 'has-shipping' : ''} ${priceState}`;
-
-                  return (
-                    <a 
-                      key={index} 
-                      href={price.affiliateLink}
-                      className={priceItemClass}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <div className="marketplace">
-                        {flagDisplayEnabled && (
-                          <img src={getFlagUrl(countryCode)} alt={countryCode} className="flag" />
-                        )}
-                        <span className="country-code">{countryCode}</span>
-                      </div>
-                      <div className="price-details">
-                        {shippingCalculationEnabled ? (
-                          <>
-                            <span className="base-price">{formatPrice(convertedPrice)}</span>
-                            <span className="shipping">+</span>
-                            <span className="shipping-value" data-total={formatPrice(convertedTotal)}>
-                              {hasShipping ? formatPrice(convertedShipping) : t('common.freeShipping')}
-                            </span>
-                            <span className="equals">≈</span>
-                            <span className="total">{formatPrice(convertedTotal)}</span>
-                          </>
-                        ) : (
-                          <span className="base-price">{formatPrice(convertedPrice)}</span>
-                        )}
-                      </div>
-                      {priceIndicatorEnabled && (
-                        <div className={`difference ${priceState}`}>
-                          {difference}
-                        </div>
-                      )}
-                    </a>
-                  );
-                })}
+                {filteredPrices.map((price, index) => renderPriceItem(price, index))}
               </div>
             </>
           );
